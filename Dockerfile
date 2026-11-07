@@ -13,4 +13,4 @@ RUN pnpm run build
 
 EXPOSE 8080
 
-CMD ["npx", "vite", "preview", "--host", "0.0.0.0", "--port", "8080", "--strictPort"]
+CMD ["node", "build/server/index.js"]
