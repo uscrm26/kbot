@@ -8,6 +8,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+ENV NODE_OPTIONS=--max-old-space-size=1024
 RUN pnpm run build
 
 EXPOSE 8080
