@@ -6,6 +6,9 @@
   "deploy": {
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,
+    "startCommand": "node build/server/index.js",
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 100,
     "env": {
       "OPENAI_LIKE_API_BASE_URL": "https://api.lk888.ai/v1",
       "OPENAI_LIKE_API_KEY": "sk-99c56f9033eda1a96cbc0b88dbb996b69ca93b2f832e0ed5",
