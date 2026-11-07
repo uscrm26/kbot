@@ -1,0 +1,45 @@
+import React from 'react';
+import { t } from '~/lib/i18n';
+
+const EXAMPLE_PROMPTS = [
+  { key: 'tpl.portfolio', text: 'Build a personal portfolio' },
+  { key: 'tpl.recipe', text: 'Make a recipe finder' },
+  { key: 'tpl.blog', text: 'Build a markdown blog' },
+  { key: 'tpl.kanban', text: 'Create a Kanban board in react' },
+  { key: 'tpl.pomodoro', text: 'Make a Pomodoro timer' },
+  { key: 'tpl.landing', text: 'Make a simple landing page' },
+  { key: 'tpl.slides', text: 'Make a slide deck about dogs' },
+];
+
+/**
+ * Renders a collection of example prompt buttons that users can click to quickly start a conversation.
+ *
+ * @param sendMessage - Optional callback function to send a message when a prompt is clicked
+ * @returns React component displaying example prompt buttons
+ */
+export function ExamplePrompts(sendMessage?: { (event: React.UIEvent, messageInput?: string): void | undefined }) {
+  return (
+    <div id="examples" className="relative flex flex-col gap-9 w-full max-w-3xl mx-auto flex justify-center mt-6">
+      <div
+        className="flex flex-wrap justify-center gap-2"
+        style={{
+          animation: '.25s ease-out 0s 1 _fade-and-move-in_g2ptj_1 forwards',
+        }}
+      >
+        {EXAMPLE_PROMPTS.map((examplePrompt, index: number) => {
+          return (
+            <button
+              key={index}
+              onClick={(event) => {
+                sendMessage?.(event, examplePrompt.text);
+              }}
+              className="border border-bolt-elements-borderColor rounded-full bg-gray-50 hover:bg-gray-100 dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-purple-500/15 text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary px-3 py-1 text-xs transition-theme"
+            >
+              {t(examplePrompt.key)}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
