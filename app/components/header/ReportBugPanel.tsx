@@ -1,7 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Bug, ExternalLink, X } from 'lucide-react';
+import { t } from '~/lib/i18n';
 
-const BUG_REPORT_URL = 'https://github.com/stackblitz-labs/bolt.diy/issues/new?template=bug_report.yml';
+const BUG_REPORT_URL = 'https://github.com/uscrm26/kbot/issues/new';
 
 interface ReportBugPanelProps {
   open: boolean;
@@ -20,9 +21,9 @@ export function ReportBugPanel({ open, onClose }: ReportBugPanelProps) {
                 <Bug className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <Dialog.Title className="truncate text-sm font-semibold">Report a bug</Dialog.Title>
+                <Dialog.Title className="truncate text-sm font-semibold">{t('report.bug')}</Dialog.Title>
                 <Dialog.Description className="truncate text-xs text-bolt-elements-textSecondary">
-                  Help us improve bolt.diy
+                  {t('report.bug.desc')}
                 </Dialog.Description>
               </div>
             </div>
@@ -30,7 +31,7 @@ export function ReportBugPanel({ open, onClose }: ReportBugPanelProps) {
             <Dialog.Close asChild>
               <button
                 type="button"
-                aria-label="Close bug report"
+                aria-label={t('button.close')}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-bolt-elements-textSecondary transition-colors hover:bg-bolt-elements-background-depth-2 hover:text-bolt-elements-textPrimary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
               >
                 <X className="h-5 w-5" />
@@ -39,10 +40,9 @@ export function ReportBugPanel({ open, onClose }: ReportBugPanelProps) {
           </header>
 
           <div className="flex flex-1 flex-col items-start justify-center px-8 py-12 sm:px-14">
-            <p className="mb-2 text-lg font-semibold">Found something that isn’t working?</p>
+            <p className="mb-2 text-lg font-semibold">{t('report.bug.title')}</p>
             <p className="mb-6 max-w-lg text-sm leading-6 text-bolt-elements-textSecondary">
-              Bug reports are submitted through GitHub. Continue there to describe the problem and send it to the
-              bolt.diy team.
+              {t('report.bug.subtitle')}
             </p>
             <a
               href={BUG_REPORT_URL}
@@ -51,7 +51,7 @@ export function ReportBugPanel({ open, onClose }: ReportBugPanelProps) {
               className="inline-flex items-center gap-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 px-4 py-2.5 text-sm font-medium text-bolt-elements-textPrimary transition-colors hover:bg-bolt-elements-background-depth-3"
             >
               <ExternalLink className="h-4 w-4" />
-              Continue to GitHub
+              {t('button.continue.github')}
             </a>
           </div>
         </Dialog.Content>

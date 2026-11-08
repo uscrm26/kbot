@@ -8,6 +8,7 @@ import { workbenchStore } from '~/lib/stores/workbench';
 import { classNames } from '~/utils/classNames';
 import { WORK_DIR } from '~/utils/constants';
 import { cubicEasingFn } from '~/utils/easings';
+import { t } from '~/lib/i18n';
 
 const highlighterOptions = {
   langs: ['shell'],
@@ -102,14 +103,14 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
   const setupDescription = failed
     ? 'One or more setup actions failed.'
     : interrupted
-      ? 'Project setup was interrupted.'
+      ? t('artifact.project.interrupted')
       : emptySetup
-        ? 'No setup actions were generated.'
+        ? t('artifact.no.setup.actions')
         : allActionFinished
           ? restored
-            ? 'Restore files from snapshot'
-            : 'Initial files created'
-          : 'Creating initial files';
+            ? t('artifact.restore.snapshot')
+            : t('artifact.initial.files.created')
+          : t('artifact.creating.files');
 
   return (
     <>
@@ -128,7 +129,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
                 {dynamicTitle}
               </div>
               <div className="w-full w-full text-bolt-elements-textSecondary text-xs mt-0.5">
-                Click to open Workbench
+                {t('artifact.click.open.workbench')}
               </div>
             </div>
           </button>
