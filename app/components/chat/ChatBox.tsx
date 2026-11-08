@@ -94,6 +94,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   const [buildMode, setBuildMode] = React.useState<BuildMode>('speed');
   const [modeOpen, setModeOpen] = React.useState(false);
   const [hoveredMode, setHoveredMode] = React.useState<BuildMode | null>(null);
+  const [isAdvancedMode, setIsAdvancedMode] = React.useState(false); // 簡易/進階模式切換
   const purposeOptions = getPurposeOptions();
   const tabs = getTabs();
   const mcpToolsInitialized = useMCPStore((state) => state.isInitialized);
@@ -197,7 +198,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   return (
     <div
       className={classNames(
-        'relative bg-white/70 backdrop-blur-xl p-3 rounded-2xl border border-white/60 shadow-[0_8px_40px_rgba(37,87,235,0.10)] relative w-full max-w-chat mx-auto z-prompt',
+        'relative bg-white/80 backdrop-blur-2xl p-3 rounded-2xl border border-white/50 shadow-[0_4px_24px_rgba(37,99,235,0.08),0_1px_2px_rgba(0,0,0,0.04)] relative w-full max-w-chat mx-auto z-prompt',
 
         /*
          * {
@@ -299,7 +300,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
       <div
         className={classNames('relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg')}
       >
-        {!props.chatStarted && (
+        {!props.chatStarted && isAdvancedMode && (
           <div className="flex items-center gap-1 px-2 pt-2 border-b border-bolt-elements-borderColor flex-wrap">
             {tabs.map((tab) => (
               <button
@@ -418,7 +419,8 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               <div className="i-ph:sparkles text-base" />
               <span>意圖識別</span>
             </button>
-            {purposeOptions.map((p) => (
+            {/* 簡易模式只顯示前 3 個核心選項，進階模式顯示全部 */}
+            {(isAdvancedMode ? purposeOptions : purposeOptions.slice(0, 3)).map((p) => (
               <button
                 key={p.id}
                 type="button"
@@ -435,6 +437,15 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 <span>{p.title}</span>
               </button>
             ))}
+            {/* 簡易/進階模式切換按鈕 */}
+            <button
+              type="button"
+              onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-full text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+            >
+              <div className={`${isAdvancedMode ? 'i-ph:caret-up' : 'i-ph:caret-down'} text-sm`} />
+              <span>{isAdvancedMode ? '簡易模式' : '進階模式'}</span>
+            </button>
           </div>
         )}
         <div className="flex justify-between items-center text-sm p-4 pt-2">
