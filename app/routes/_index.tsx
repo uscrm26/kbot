@@ -24,7 +24,8 @@ export default function Index() {
       <BackgroundRays />
       <Header />
       <ClientOnly fallback={<BaseChat />}>{() => <Chat />}</ClientOnly>
-      <FirstRunOnboarding />
+      {/* 暫時注釋掉歡迎引導頁面，打開網站直接是生成頁面 */}
+      {/* <FirstRunOnboarding /> */}
     </div>
   );
 }

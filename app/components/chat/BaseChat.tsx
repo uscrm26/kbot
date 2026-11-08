@@ -615,7 +615,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       'transition-all duration-200 ease-in-out rounded-lg',
                     )}
                   />
-                  <GitCloneButton importChat={importChat} />
+                  {/* 暫時隱藏複製倉庫按鈕，因為我們已經清理了第三方部署功能 */}
+                  {/* <GitCloneButton importChat={importChat} /> */}
                 </div>
               )}
               <div className="flex flex-col gap-5">
