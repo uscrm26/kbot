@@ -29,6 +29,8 @@ import { getFilePaths, selectContext } from '~/lib/.server/llm/select-context';
 import { streamText, type StreamingOptions } from '~/lib/.server/llm/stream-text';
 import { extractPropertiesFromMessage } from '~/lib/.server/llm/utils';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
+import { getCurrentUser } from '~/lib/server/auth';
+import { checkQuota, deductQuota } from '~/lib/server/quota';
 import { getAgentLoopInstructions, getAgentLoopProgress } from '~/lib/common/agentLoop';
 import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
 import { getStarterBuildProgress } from '~/lib/common/starterBuild';
@@ -78,6 +80,20 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
   } = body;
 
   const messages = asMessages(body.messages);
+
+  // 配額檢查
+  const user = getCurrentUser(request);
+  if (user && user.role !== 'admin') {
+    // 判斷是生成還是修改
+    const isGenerate = messages.length <= 1; // 第一條消息是生成，後續是修改
+    const quotaType = isGenerate ? 'generate' : 'modify';
+    
+    const quotaCheck = checkQuota(user.id, quotaType);
+    if (!quotaCheck.allowed) {
+      return Response.json({ error: quotaCheck.reason }, { status: 403 });
+    }
+  }
+
   const starterBuild = chatMode === 'build' ? getStarterBuildProgress(messages) : getStarterBuildProgress([]);
   const agentLoopEnabled = chatMode === 'build' && (agentMode || starterBuild.status !== 'inactive');
   const agentProgress = getAgentLoopProgress(messages, agentLoopEnabled);
