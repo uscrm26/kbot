@@ -486,7 +486,7 @@ export const ModelSelector = ({
                   }
                 />
               )}
-              {provider?.name || 'Select provider'}
+              {provider?.displayName || provider?.name || 'Select provider'}
             </div>
             <div
               className={classNames(
@@ -623,7 +623,7 @@ export const ModelSelector = ({
                       )}
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: (providerOption as any).highlightedName || providerOption.name,
+                          __html: (providerOption as any).highlightedName || providerOption.displayName || providerOption.name,
                         }}
                       />
                     </div>
