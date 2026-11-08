@@ -7,7 +7,7 @@ import { FirstRunOnboarding } from '~/components/onboarding/FirstRunOnboarding';
 import BackgroundRays from '~/components/ui/BackgroundRays';
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Bolt' }, { name: 'description', content: 'Talk with Bolt, an AI assistant from StackBlitz' }];
+  return [{ title: 'K-bot - 從建站到獲客的 AI 工作檯' }, { name: 'description', content: '生成帶支付、登入和後台的可上線系統，也能完成建站和獲客。' }];
 };
 
 export const loader = () => Response.json({});

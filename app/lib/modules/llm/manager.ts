@@ -265,15 +265,11 @@ export class LLMManager {
   }
 
   getDefaultProvider(): BaseProvider {
-    /*
-     * Prefer OpenRouter explicitly. Registration order follows the export
-     * order of ./registry, which would otherwise make the default depend on
-     * which provider happens to be listed first.
-     */
-    const openRouter = this._providers.get('OpenRouter');
+    // 優先使用 OpenAILike（豆包 API）
+    const openAILike = this._providers.get('OpenAILike');
 
-    if (openRouter) {
-      return openRouter;
+    if (openAILike) {
+      return openAILike;
     }
 
     const firstProvider = this._providers.values().next().value;
