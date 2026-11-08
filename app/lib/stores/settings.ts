@@ -87,7 +87,8 @@ const getInitialProviderSettings = (): ProviderSetting => {
   const initialSettings: ProviderSetting = {};
 
   // Default enabled providers (only these 4 are enabled by default)
-  const DEFAULT_ENABLED_PROVIDERS = ['OpenRouter', 'Anthropic', 'OpenAI', 'Google'];
+  // 只啟用 OpenAILike（K-bot Agent / 豆包 API），強制使用我們的平台
+  const DEFAULT_ENABLED_PROVIDERS = ['OpenAILike'];
 
   // Start with default settings
   PROVIDER_LIST.forEach((provider) => {
