@@ -81,21 +81,21 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
   const messages = asMessages(body.messages);
 
-  // K算力檢查
-  const user = getCurrentUser(request);
-  if (user && user.role !== 'admin') {
-    // 判斷是生成還是修改
-    const isGenerate = messages.length <= 1; // 第一條消息是生成，後續是修改
-    const computeType = isGenerate ? 'generate' : 'modify';
-    
-    const computeCheck = checkKCompute(user.id, computeType);
-    if (!computeCheck.allowed) {
-      return Response.json({ 
-        error: computeCheck.reason,
-        required_k_compute: computeCheck.required,
-      }, { status: 403 });
-    }
-  }
+  // 臨時注釋掉 K算力檢查，測試是不是這個問題導致的
+  // const user = getCurrentUser(request);
+  // if (user && user.role !== 'admin') {
+  //   // 判斷是生成還是修改
+  //   const isGenerate = messages.length <= 1; // 第一條消息是生成，後續是修改
+  //   const computeType = isGenerate ? 'generate' : 'modify';
+  //
+  //   const computeCheck = checkKCompute(user.id, computeType);
+  //   if (!computeCheck.allowed) {
+  //     return Response.json({
+  //       error: computeCheck.reason,
+  //       required_k_compute: computeCheck.required,
+  //     }, { status: 403 });
+  //   }
+  // }
 
   const starterBuild = chatMode === 'build' ? getStarterBuildProgress(messages) : getStarterBuildProgress([]);
   const agentLoopEnabled = chatMode === 'build' && (agentMode || starterBuild.status !== 'inactive');
