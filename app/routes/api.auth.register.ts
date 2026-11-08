@@ -1,5 +1,5 @@
 import { createUserSession, hashPassword } from '~/lib/server/auth';
-import { db } from '~/lib/server/database';
+import { userOperations } from '~/lib/server/database';
 import type { ActionFunctionArgs } from 'react-router';
 
 // 註冊 API
@@ -27,7 +27,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // 檢查郵箱是否已存在
-  const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+  const existingUser = userOperations.findByEmail(email);
   if (existingUser) {
     return Response.json({ error: 'Email already registered' }, { status: 409 });
   }
@@ -36,27 +36,20 @@ export async function action({ request }: ActionFunctionArgs) {
   const passwordHash = hashPassword(password);
 
   // 創建用戶
-  const result = db.prepare(`
-    INSERT INTO users (email, password_hash, name, role)
-    VALUES (?, ?, ?, 'user')
-  `).run(email, passwordHash, name || email.split('@')[0]);
-
-  const userId = result.lastInsertRowid;
-
-  // 創建默認配額
-  db.prepare(`
-    INSERT INTO user_quotas (user_id, max_generations, max_modifications, max_websites)
-    VALUES (?, 10, 50, 5)
-  `).run(userId);
+  const user = userOperations.createUser({
+    email,
+    password_hash: passwordHash,
+    name: name || email.split('@')[0],
+  });
 
   // 創建 session
-  const session = createUserSession(userId);
+  const session = createUserSession(user.id);
 
-  // 返回用戶信息
-  const user = db.prepare('SELECT id, email, name, role, created_at FROM users WHERE id = ?').get(userId);
+  // 返回用戶信息（不包含密碼）
+  const { password_hash, ...userWithoutPassword } = user;
 
   return Response.json({
-    user,
+    user: userWithoutPassword,
     session,
   });
 }

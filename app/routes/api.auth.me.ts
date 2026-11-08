@@ -1,5 +1,5 @@
 import { getCurrentUser } from '~/lib/server/auth';
-import { db } from '~/lib/server/database';
+import { getUserQuota } from '~/lib/server/quota';
 import type { LoaderFunctionArgs } from 'react-router';
 
 // 獲取當前用戶信息 API
@@ -11,7 +11,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   // 獲取用戶配額
-  const quota = db.prepare('SELECT * FROM user_quotas WHERE user_id = ?').get(user.id);
+  const quota = getUserQuota(user.id);
 
   return Response.json({
     user,

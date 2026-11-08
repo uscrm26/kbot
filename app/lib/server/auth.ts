@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { db } from './database';
+import { userOperations, sessionOperations } from './database';
 
 // 密碼哈希
 export function hashPassword(password: string): string {
@@ -30,24 +30,10 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'kbot-secret-key-change-in-
 export function createUserSession(userId: number): string {
   // 生成一個簡單的 session token
   const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 天過期
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 天過期
   
   // 存儲到數據庫
-  db.prepare(`
-    CREATE TABLE IF NOT EXISTS sessions (
-      token TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      expires_at DATETIME NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )
-  `).run();
-  
-  db.prepare('INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)').run(
-    token,
-    userId,
-    new Date(expiresAt).toISOString()
-  );
+  sessionOperations.createSession(token, userId, expiresAt);
   
   return token;
 }
@@ -57,16 +43,19 @@ export function getUserFromSession(token: string): any | null {
   if (!token) return null;
   
   try {
-    const session = db.prepare(`
-      SELECT u.* FROM sessions s
-      JOIN users u ON s.user_id = u.id
-      WHERE s.token = ? AND s.expires_at > CURRENT_TIMESTAMP
-    `).get(token) as any;
+    // 先清理過期 session
+    sessionOperations.deleteExpiredSessions();
     
+    // 查找 session
+    const session = sessionOperations.findByToken(token);
     if (!session) return null;
     
+    // 查找用戶
+    const user = userOperations.findById(session.user_id);
+    if (!user) return null;
+    
     // 返回用戶信息（不包含密碼）
-    const { password_hash, ...userWithoutPassword } = session;
+    const { password_hash, ...userWithoutPassword } = user;
     return userWithoutPassword;
   } catch (error) {
     return null;

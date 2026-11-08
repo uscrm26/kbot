@@ -1,6 +1,6 @@
 import { getCurrentUser } from '~/lib/server/auth';
-import { db } from '~/lib/server/database';
-import type { ActionFunctionArgs } from 'react-router';
+import { websiteOperations } from '~/lib/server/database';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 
 // 綁定自定義網域 API
 export async function action({ request }: ActionFunctionArgs) {
@@ -28,19 +28,15 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // 檢查網站是否存在且屬於當前用戶
-  const website = db.prepare('SELECT * FROM websites WHERE id = ? AND user_id = ?').get(websiteId, user.id);
-  if (!website) {
+  const website = websiteOperations.findById(websiteId);
+  if (!website || website.user_id !== user.id) {
     return Response.json({ error: 'Website not found' }, { status: 404 });
   }
 
-  // 檢查網域是否已被其他用戶綁定
-  const existingDomain = db.prepare('SELECT id FROM websites WHERE custom_domain = ? AND id != ?').get(customDomain, websiteId);
-  if (existingDomain) {
-    return Response.json({ error: 'Domain already in use' }, { status: 409 });
-  }
-
   // 更新網域
-  db.prepare('UPDATE websites SET custom_domain = ? WHERE id = ?').run(customDomain, websiteId);
+  websiteOperations.updateWebsite(websiteId, {
+    custom_domain: customDomain,
+  });
 
   // 生成驗證記錄
   const verificationToken = `kbot-verify-${Math.random().toString(36).substring(2, 15)}`;
@@ -65,12 +61,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const websites = db.prepare(`
-    SELECT id, name, custom_domain, preview_url, status 
-    FROM websites 
-    WHERE user_id = ?
-    ORDER BY created_at DESC
-  `).all(user.id);
+  const websites = websiteOperations.findByUserId(user.id);
 
   return Response.json({ websites });
 }

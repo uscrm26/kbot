@@ -1,5 +1,5 @@
-import { createUserSession, getUserFromSession, hashPassword, verifyPassword } from '~/lib/server/auth';
-import { db } from '~/lib/server/database';
+import { createUserSession, verifyPassword } from '~/lib/server/auth';
+import { userOperations } from '~/lib/server/database';
 import type { ActionFunctionArgs } from 'react-router';
 
 // 登入 API
@@ -16,9 +16,9 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // 查找用戶
-  const user = db.prepare('SELECT * FROM users WHERE email = ? AND is_active = 1').get(email) as any;
+  const user = userOperations.findByEmail(email);
 
-  if (!user || !user.password_hash) {
+  if (!user || !user.password_hash || !user.is_active) {
     return Response.json({ error: 'Invalid email or password' }, { status: 401 });
   }
 
@@ -30,7 +30,9 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // 更新最後登錄時間
-  db.prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?').run(user.id);
+  userOperations.updateUser(user.id, {
+    last_login_at: new Date().toISOString(),
+  });
 
   // 創建 session
   const session = createUserSession(user.id);

@@ -1,6 +1,6 @@
 import { getCurrentUser } from '~/lib/server/auth';
 import { checkQuota, deductQuota } from '~/lib/server/quota';
-import { db } from '~/lib/server/database';
+import { websiteOperations } from '~/lib/server/database';
 import fs from 'fs';
 import path from 'path';
 import type { ActionFunctionArgs } from 'react-router';
@@ -42,41 +42,40 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (websiteId) {
     // 更新現有網站
-    website = db.prepare('SELECT * FROM websites WHERE id = ?').get(websiteId) as any;
+    website = websiteOperations.findById(websiteId);
     if (!website) {
       return Response.json({ error: 'Website not found' }, { status: 404 });
     }
 
-    db.prepare(`
-      UPDATE websites 
-      SET name = ?, description = ?, files = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(name, description, JSON.stringify(files), websiteId);
-
-    website = db.prepare('SELECT * FROM websites WHERE id = ?').get(websiteId);
+    website = websiteOperations.updateWebsite(websiteId, {
+      name,
+      description,
+      files,
+    });
   } else {
     // 創建新網站
-    const result = db.prepare(`
-      INSERT INTO websites (user_id, name, description, files, status)
-      VALUES (?, ?, ?, ?, 'published')
-    `).run(userId, name, description, JSON.stringify(files));
-
-    const newWebsiteId = result.lastInsertRowid;
+    const newWebsite = websiteOperations.createWebsite({
+      user_id: userId,
+      name,
+      description,
+      files,
+      status: 'published',
+    });
 
     // 生成預覽 URL
-    const previewUrl = `/preview/${newWebsiteId}`;
-    db.prepare('UPDATE websites SET preview_url = ? WHERE id = ?').run(previewUrl, newWebsiteId);
+    const previewUrl = `/preview/${newWebsite.id}`;
+    website = websiteOperations.updateWebsite(newWebsite.id, {
+      preview_url: previewUrl,
+    });
 
     // 扣減配額
     if (userId > 0) {
       deductQuota(userId, 'website');
     }
-
-    website = db.prepare('SELECT * FROM websites WHERE id = ?').get(newWebsiteId);
   }
 
   // 保存文件到服務器
-  const websiteDir = path.join(WEBSITES_DIR, website.id.toString());
+  const websiteDir = path.join(WEBSITES_DIR, website!.id.toString());
   if (!fs.existsSync(websiteDir)) {
     fs.mkdirSync(websiteDir, { recursive: true });
   }
@@ -93,6 +92,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return Response.json({
     website,
-    previewUrl: website.preview_url,
+    previewUrl: website!.preview_url,
   });
 }

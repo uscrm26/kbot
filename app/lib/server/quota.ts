@@ -1,56 +1,80 @@
-import { db } from './database';
+import { userOperations } from './database';
+import { K_COMPUTE_PRICES } from './kcompute';
 
-// 檢查用戶是否有足夠的配額
+// 檢查用戶是否有足夠的配額（基於 K算力）
 export function checkQuota(
   userId: number,
   type: 'generate' | 'modify' | 'website'
-): { allowed: boolean; reason?: string } {
-  const quota = db.prepare('SELECT * FROM user_quotas WHERE user_id = ?').get(userId) as any;
+): { allowed: boolean; reason?: string; required?: number } {
+  const user = userOperations.findById(userId);
 
-  if (!quota) {
-    return { allowed: false, reason: 'Quota not found' };
+  if (!user) {
+    return { allowed: false, reason: 'User not found' };
   }
 
+  // 管理員無限配額
+  if (user.role === 'admin') {
+    return { allowed: true };
+  }
+
+  let required = 0;
   switch (type) {
     case 'generate':
-      if (quota.used_generations >= quota.max_generations) {
-        return { allowed: false, reason: 'Generation quota exceeded' };
-      }
+      required = K_COMPUTE_PRICES.generate;
       break;
     case 'modify':
-      if (quota.used_modifications >= quota.max_modifications) {
-        return { allowed: false, reason: 'Modification quota exceeded' };
-      }
+      required = K_COMPUTE_PRICES.modify;
       break;
     case 'website':
-      if (quota.used_websites >= quota.max_websites) {
-        return { allowed: false, reason: 'Website quota exceeded' };
-      }
+      required = 0; // 網站數量暫不限制
       break;
+  }
+
+  if (required > 0 && user.k_compute_balance < required) {
+    return { 
+      allowed: false, 
+      reason: 'Insufficient K compute balance',
+      required,
+    };
   }
 
   return { allowed: true };
 }
 
-// 扣減配額
+// 扣減配額（基於 K算力）
 export function deductQuota(
   userId: number,
   type: 'generate' | 'modify' | 'website'
 ): void {
+  const user = userOperations.findById(userId);
+  if (!user) return;
+
+  let cost = 0;
   switch (type) {
     case 'generate':
-      db.prepare('UPDATE user_quotas SET used_generations = used_generations + 1 WHERE user_id = ?').run(userId);
+      cost = K_COMPUTE_PRICES.generate;
       break;
     case 'modify':
-      db.prepare('UPDATE user_quotas SET used_modifications = used_modifications + 1 WHERE user_id = ?').run(userId);
+      cost = K_COMPUTE_PRICES.modify;
       break;
-    case 'website':
-      db.prepare('UPDATE user_quotas SET used_websites = used_websites + 1 WHERE user_id = ?').run(userId);
-      break;
+  }
+
+  if (cost > 0) {
+    userOperations.updateUser(userId, {
+      k_compute_balance: user.k_compute_balance - cost,
+      k_compute_used: user.k_compute_used + cost,
+    });
   }
 }
 
 // 獲取用戶配額信息
 export function getUserQuota(userId: number): any {
-  return db.prepare('SELECT * FROM user_quotas WHERE user_id = ?').get(userId);
+  const user = userOperations.findById(userId);
+  if (!user) return null;
+
+  return {
+    k_compute_balance: user.k_compute_balance,
+    k_compute_used: user.k_compute_used,
+    tier: user.tier,
+  };
 }

@@ -1,5 +1,5 @@
 import { getCurrentUser } from '~/lib/server/auth';
-import { db } from '~/lib/server/database';
+import { userOperations } from '~/lib/server/database';
 import type { LoaderFunctionArgs, ActionFunctionArgs } from 'react-router';
 
 // 檢查是否是管理員
@@ -18,15 +18,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // 獲取用戶列表，包含配額信息
-  const users = db.prepare(`
-    SELECT u.id, u.email, u.name, u.role, u.is_active, u.created_at, u.last_login_at,
-           q.max_generations, q.max_modifications, q.max_websites,
-           q.used_generations, q.used_modifications, q.used_websites
-    FROM users u
-    LEFT JOIN user_quotas q ON u.id = q.user_id
-    ORDER BY u.created_at DESC
-  `).all();
+  // 獲取用戶列表
+  const users = userOperations.getAllUsers().map(u => {
+    const { password_hash, ...userWithoutPassword } = u;
+    return userWithoutPassword;
+  });
 
   return Response.json({ users });
 }
@@ -43,27 +39,25 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const body = await request.json();
-  const { userId, max_generations, max_modifications, max_websites, is_active } = body;
+  const { userId, k_compute_balance, is_active, tier } = body;
 
   if (!userId) {
     return Response.json({ error: 'User ID is required' }, { status: 400 });
   }
 
-  // 更新用戶狀態
+  // 更新用戶信息
+  const updates: any = {};
   if (is_active !== undefined) {
-    db.prepare('UPDATE users SET is_active = ? WHERE id = ?').run(is_active ? 1 : 0, userId);
+    updates.is_active = is_active;
+  }
+  if (k_compute_balance !== undefined) {
+    updates.k_compute_balance = k_compute_balance;
+  }
+  if (tier !== undefined) {
+    updates.tier = tier;
   }
 
-  // 更新配額
-  if (max_generations !== undefined || max_modifications !== undefined || max_websites !== undefined) {
-    db.prepare(`
-      UPDATE user_quotas 
-      SET max_generations = COALESCE(?, max_generations),
-          max_modifications = COALESCE(?, max_modifications),
-          max_websites = COALESCE(?, max_websites)
-      WHERE user_id = ?
-    `).run(max_generations, max_modifications, max_websites, userId);
-  }
+  userOperations.updateUser(userId, updates);
 
   return Response.json({ success: true });
 }

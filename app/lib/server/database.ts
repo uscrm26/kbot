@@ -1,118 +1,253 @@
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-// 數據庫文件路徑
-const DB_PATH = process.env.DATABASE_PATH || path.join(process.cwd(), 'data', 'kbot.db');
+// 數據文件路徑
+const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+const DB_PATH = path.join(DATA_DIR, 'kbot.json');
 
 // 確保數據目錄存在
-const dataDir = path.dirname(DB_PATH);
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// 創建數據庫連接
-const db = new Database(DB_PATH);
+// 默認數據結構
+interface User {
+  id: number;
+  email: string;
+  password_hash: string;
+  name: string;
+  avatar_url?: string;
+  role: 'admin' | 'user';
+  tier: 'free' | 'starter' | 'pro' | 'enterprise';
+  k_compute_balance: number;
+  k_compute_used: number;
+  is_active: boolean;
+  google_id?: string;
+  apple_id?: string;
+  github_id?: string;
+  created_at: string;
+  last_login_at?: string;
+}
 
-// 啟用 WAL 模式，提高並發性能
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+interface Website {
+  id: number;
+  user_id: number;
+  name: string;
+  description?: string;
+  custom_domain?: string;
+  preview_url?: string;
+  status: 'draft' | 'published' | 'disabled';
+  files?: any;
+  created_at: string;
+  updated_at: string;
+}
 
-// 初始化數據庫表
+interface GenerationHistory {
+  id: number;
+  user_id: number;
+  website_id?: number;
+  prompt: string;
+  type: 'generate' | 'modify';
+  tokens_used?: number;
+  created_at: string;
+}
+
+interface Session {
+  token: string;
+  user_id: number;
+  expires_at: string;
+  created_at: string;
+}
+
+interface Database {
+  users: User[];
+  websites: Website[];
+  generation_history: GenerationHistory[];
+  sessions: Session[];
+  nextUserId: number;
+  nextWebsiteId: number;
+  nextHistoryId: number;
+}
+
+// 加載數據庫
+function loadDatabase(): Database {
+  if (fs.existsSync(DB_PATH)) {
+    const raw = fs.readFileSync(DB_PATH, 'utf-8');
+    const data = JSON.parse(raw);
+    // 確保所有字段都存在
+    return {
+      users: data.users || [],
+      websites: data.websites || [],
+      generation_history: data.generation_history || [],
+      sessions: data.sessions || [],
+      nextUserId: data.nextUserId || 1,
+      nextWebsiteId: data.nextWebsiteId || 1,
+      nextHistoryId: data.nextHistoryId || 1,
+    };
+  }
+  return {
+    users: [],
+    websites: [],
+    generation_history: [],
+    sessions: [],
+    nextUserId: 1,
+    nextWebsiteId: 1,
+    nextHistoryId: 1,
+  };
+}
+
+// 保存數據庫
+function saveDatabase(db: Database) {
+  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8');
+}
+
+// 初始化數據庫
+let db = loadDatabase();
+
+// 初始化數據庫表（創建管理員賬戶）
 export function initDatabase() {
-  // 用戶表
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT,
-      name TEXT,
-      avatar_url TEXT,
-      role TEXT NOT NULL DEFAULT 'user', -- admin, user
-      tier TEXT NOT NULL DEFAULT 'free', -- free, starter, pro, enterprise
-      k_compute_balance REAL NOT NULL DEFAULT 10, -- 當前 K算力餘額
-      k_compute_used REAL NOT NULL DEFAULT 0, -- 本月已用 K算力
-      is_active BOOLEAN NOT NULL DEFAULT 1,
-      google_id TEXT UNIQUE,
-      apple_id TEXT UNIQUE,
-      github_id TEXT UNIQUE,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      last_login_at DATETIME
-    )
-  `);
-
-  // 用戶配額表
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS user_quotas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL UNIQUE,
-      max_generations INTEGER NOT NULL DEFAULT 10, -- 最多生成次數
-      max_modifications INTEGER NOT NULL DEFAULT 50, -- 最多修改次數
-      max_websites INTEGER NOT NULL DEFAULT 5, -- 最多網站數
-      used_generations INTEGER NOT NULL DEFAULT 0,
-      used_modifications INTEGER NOT NULL DEFAULT 0,
-      used_websites INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )
-  `);
-
-  // 網站表
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS websites (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      name TEXT NOT NULL,
-      description TEXT,
-      custom_domain TEXT UNIQUE,
-      preview_url TEXT,
-      status TEXT NOT NULL DEFAULT 'draft', -- draft, published, disabled
-      files JSON,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    )
-  `);
-
-  // 生成歷史表
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS generation_history (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      website_id INTEGER,
-      prompt TEXT NOT NULL,
-      type TEXT NOT NULL, -- generate, modify
-      tokens_used INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY (website_id) REFERENCES websites(id) ON DELETE SET NULL
-    )
-  `);
-
-  // 創建管理員賬戶（如果不存在）
   const adminEmail = 'williamskevin@qq.com';
-  const existingAdmin = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
+  const existingAdmin = db.users.find(u => u.email === adminEmail);
   
   if (!existingAdmin) {
-    // 這裡使用簡單的密碼哈希，實際生產環境應該用 bcrypt
-    const passwordHash = require('crypto')
+    const crypto = require('crypto');
+    const passwordHash = crypto
       .createHash('sha256')
       .update('kewq3211')
       .digest('hex');
 
-    const result = db.prepare(`
-      INSERT INTO users (email, password_hash, name, role)
-      VALUES (?, ?, ?, 'admin')
-    `).run(adminEmail, passwordHash, '管理員');
+    const adminUser: User = {
+      id: db.nextUserId++,
+      email: adminEmail,
+      password_hash: passwordHash,
+      name: '管理員',
+      role: 'admin',
+      tier: 'enterprise',
+      k_compute_balance: 999999,
+      k_compute_used: 0,
+      is_active: true,
+      created_at: new Date().toISOString(),
+    };
 
-    // 創建管理員配額（無限）
-    db.prepare(`
-      INSERT INTO user_quotas (user_id, max_generations, max_modifications, max_websites)
-      VALUES (?, 999999, 999999, 999999)
-    `).run(result.lastInsertRowid);
-
+    db.users.push(adminUser);
+    saveDatabase(db);
     console.log('Admin account created:', adminEmail);
   }
 }
+
+// 用戶操作
+export const userOperations = {
+  findByEmail(email: string): User | undefined {
+    return db.users.find(u => u.email === email);
+  },
+
+  findById(id: number): User | undefined {
+    return db.users.find(u => u.id === id);
+  },
+
+  createUser(user: Omit<User, 'id' | 'created_at' | 'k_compute_balance' | 'k_compute_used' | 'is_active' | 'role' | 'tier'>): User {
+    const newUser: User = {
+      id: db.nextUserId++,
+      role: 'user',
+      tier: 'free',
+      k_compute_balance: 10,
+      k_compute_used: 0,
+      is_active: true,
+      created_at: new Date().toISOString(),
+      ...user,
+    };
+    db.users.push(newUser);
+    saveDatabase(db);
+    return newUser;
+  },
+
+  updateUser(id: number, updates: Partial<User>): User | undefined {
+    const index = db.users.findIndex(u => u.id === id);
+    if (index === -1) return undefined;
+    db.users[index] = { ...db.users[index], ...updates };
+    saveDatabase(db);
+    return db.users[index];
+  },
+
+  getAllUsers(): User[] {
+    return db.users;
+  },
+};
+
+// 網站操作
+export const websiteOperations = {
+  findById(id: number): Website | undefined {
+    return db.websites.find(w => w.id === id);
+  },
+
+  findByUserId(userId: number): Website[] {
+    return db.websites.filter(w => w.user_id === userId);
+  },
+
+  createWebsite(website: Omit<Website, 'id' | 'created_at' | 'updated_at' | 'status'>): Website {
+    const newWebsite: Website = {
+      id: db.nextWebsiteId++,
+      status: 'draft',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      ...website,
+    };
+    db.websites.push(newWebsite);
+    saveDatabase(db);
+    return newWebsite;
+  },
+
+  updateWebsite(id: number, updates: Partial<Website>): Website | undefined {
+    const index = db.websites.findIndex(w => w.id === id);
+    if (index === -1) return undefined;
+    db.websites[index] = { ...db.websites[index], ...updates, updated_at: new Date().toISOString() };
+    saveDatabase(db);
+    return db.websites[index];
+  },
+};
+
+// 生成歷史操作
+export const historyOperations = {
+  createHistory(history: Omit<GenerationHistory, 'id' | 'created_at'>): GenerationHistory {
+    const newHistory: GenerationHistory = {
+      id: db.nextHistoryId++,
+      created_at: new Date().toISOString(),
+      ...history,
+    };
+    db.generation_history.push(newHistory);
+    saveDatabase(db);
+    return newHistory;
+  },
+
+  findByUserId(userId: number): GenerationHistory[] {
+    return db.generation_history.filter(h => h.user_id === userId);
+  },
+};
+
+// Session 操作
+export const sessionOperations = {
+  createSession(token: string, userId: number, expiresAt: Date): Session {
+    const newSession: Session = {
+      token,
+      user_id: userId,
+      expires_at: expiresAt.toISOString(),
+      created_at: new Date().toISOString(),
+    };
+    db.sessions.push(newSession);
+    saveDatabase(db);
+    return newSession;
+  },
+
+  findByToken(token: string): Session | undefined {
+    return db.sessions.find(s => s.token === token);
+  },
+
+  deleteExpiredSessions() {
+    const now = new Date().toISOString();
+    db.sessions = db.sessions.filter(s => s.expires_at > now);
+    saveDatabase(db);
+  },
+};
 
 // 初始化數據庫
 initDatabase();
