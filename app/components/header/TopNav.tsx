@@ -26,6 +26,11 @@ export function TopNav() {
           <button
             key={link.id}
             type="button"
+            onClick={() => {
+              if (link.id === 'pricing') {
+                window.location.href = '/pricing';
+              }
+            }}
             className="px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-white transition-colors whitespace-nowrap"
           >
             {link.label}
