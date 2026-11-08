@@ -198,7 +198,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   return (
     <div
       className={classNames(
-        'relative bg-white/80 backdrop-blur-2xl p-3 rounded-2xl border border-white/50 shadow-[0_4px_24px_rgba(37,99,235,0.08),0_1px_2px_rgba(0,0,0,0.04)] relative w-full max-w-chat mx-auto z-prompt',
+        'relative bg-white/80 backdrop-blur-2xl p-3 rounded-2xl border border-blue-100/80 shadow-[0_4px_24px_rgba(37,99,235,0.08),0_1px_2px_rgba(0,0,0,0.04)] relative w-full max-w-chat mx-auto z-prompt',
 
         /*
          * {

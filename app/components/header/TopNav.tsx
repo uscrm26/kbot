@@ -14,8 +14,8 @@ export function TopNav() {
   const languages = getAvailableLanguages();
 
   return (
-    <div className="flex items-center gap-1 w-full bg-white">
-      <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-2 w-full bg-white/90 backdrop-blur-xl px-6 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border-b border-gray-100">
+      <div className="flex items-center gap-1">
         {nav.groups.map((group) => (
           <GroupMenu
             key={group.id}
