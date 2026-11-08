@@ -159,13 +159,9 @@ export default class OpenAILikeProvider extends BaseProvider {
     const { model, serverEnv, apiKeys, providerSettings } = options;
     const envRecord = this.convertEnvToRecord(serverEnv);
 
-    const { baseUrl, apiKey } = this.getProviderBaseUrlAndKey({
-      apiKeys,
-      providerSettings: providerSettings?.[this.name],
-      serverEnv: envRecord,
-      defaultBaseUrlKey: 'OPENAI_LIKE_API_BASE_URL',
-      defaultApiTokenKey: 'OPENAI_LIKE_API_KEY',
-    });
+    // 直接硬編碼配置，先用於測試
+    const baseUrl = 'https://api.lk888.ai/v1';
+    const apiKey = 'sk-99c56f9033eda1a96cbc0b88dbb996b69ca93b2f832e0ed5';
 
     if (!baseUrl || !apiKey) {
       throw new Error(`Missing configuration for ${this.name} provider`);
