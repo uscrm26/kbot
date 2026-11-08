@@ -1,12 +1,6 @@
-import { useStore } from '@nanostores/react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ExternalLink, X } from 'lucide-react';
-import { themeStore } from '~/lib/stores/theme';
-import { getThemeMode } from '~/types/theme';
-
-const credentiallessIframeAttributes = { credentialless: 'true' };
-
-const DOCUMENTATION_URL = 'https://stackblitz-labs.github.io/bolt.diy/';
+import { X } from 'lucide-react';
+import { t } from '~/lib/i18n';
 
 interface DocumentationPanelProps {
   open: boolean;
@@ -14,9 +8,6 @@ interface DocumentationPanelProps {
 }
 
 export function DocumentationPanel({ open, onClose }: DocumentationPanelProps) {
-  const theme = useStore(themeStore);
-  const documentationUrl = `${DOCUMENTATION_URL}?theme=${getThemeMode(theme)}`;
-
   return (
     <Dialog.Root open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <Dialog.Portal>
@@ -28,23 +19,14 @@ export function DocumentationPanel({ open, onClose }: DocumentationPanelProps) {
                 <div className="i-ph:book-open-text h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <Dialog.Title className="truncate text-sm font-semibold">K-bot 使用手冊</Dialog.Title>
+                <Dialog.Title className="truncate text-sm font-semibold">{t('docs.title')}</Dialog.Title>
                 <Dialog.Description className="truncate text-xs text-bolt-elements-textSecondary">
-                  產品說明與使用指南
+                  {t('docs.subtitle')}
                 </Dialog.Description>
               </div>
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <a
-                href={documentationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-bolt-elements-borderColor px-3 py-2 text-xs font-medium text-bolt-elements-textSecondary transition-colors hover:bg-bolt-elements-background-depth-2 hover:text-bolt-elements-textPrimary"
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">在新分頁開啟</span>
-              </a>
               <Dialog.Close asChild>
                 <button
                   type="button"
@@ -57,13 +39,52 @@ export function DocumentationPanel({ open, onClose }: DocumentationPanelProps) {
             </div>
           </header>
 
-          <iframe
-            {...credentiallessIframeAttributes}
-            title="bolt.diy documentation"
-            src={open ? documentationUrl : 'about:blank'}
-            className="min-h-0 w-full flex-1 border-0 bg-bolt-elements-background-depth-1"
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
+          <div className="min-h-0 w-full flex-1 overflow-auto p-6">
+            <div className="max-w-3xl mx-auto space-y-6">
+              {/* 歡迎區塊 */}
+              <div>
+                <h2 className="text-2xl font-bold mb-2">{t('docs.welcome')}</h2>
+                <p className="text-bolt-elements-textSecondary">{t('docs.welcome.description')}</p>
+              </div>
+
+              {/* 主要功能區塊 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">{t('docs.features')}</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-600">•</span>
+                    <span>{t('docs.feature.1')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-600">•</span>
+                    <span>{t('docs.feature.2')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-600">•</span>
+                    <span>{t('docs.feature.3')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-600">•</span>
+                    <span>{t('docs.feature.4')}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-600">•</span>
+                    <span>{t('docs.feature.5')}</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* 快速開始區塊 */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">{t('docs.quickstart')}</h3>
+                <ol className="space-y-2 text-sm list-decimal list-inside">
+                  <li>{t('docs.quickstart.1')}</li>
+                  <li>{t('docs.quickstart.2')}</li>
+                  <li>{t('docs.quickstart.3')}</li>
+                </ol>
+              </div>
+            </div>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
