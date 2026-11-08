@@ -29,6 +29,9 @@ export function initDatabase() {
       name TEXT,
       avatar_url TEXT,
       role TEXT NOT NULL DEFAULT 'user', -- admin, user
+      tier TEXT NOT NULL DEFAULT 'free', -- free, starter, pro, enterprise
+      k_compute_balance REAL NOT NULL DEFAULT 10, -- 當前 K算力餘額
+      k_compute_used REAL NOT NULL DEFAULT 0, -- 本月已用 K算力
       is_active BOOLEAN NOT NULL DEFAULT 1,
       google_id TEXT UNIQUE,
       apple_id TEXT UNIQUE,
