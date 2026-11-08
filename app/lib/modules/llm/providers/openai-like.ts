@@ -9,7 +9,8 @@ interface OpenAIModelsResponse {
 }
 
 export default class OpenAILikeProvider extends BaseProvider {
-  name = 'K-bot Agent';
+  name = 'OpenAILike';
+  displayName = 'K-bot Agent';
   getApiKeyLink = undefined;
 
   config = {
