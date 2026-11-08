@@ -39,49 +39,88 @@ export function DocumentationPanel({ open, onClose }: DocumentationPanelProps) {
             </div>
           </header>
 
-          <div className="min-h-0 w-full flex-1 overflow-auto p-6">
-            <div className="max-w-3xl mx-auto space-y-6">
-              {/* 歡迎區塊 */}
-              <div>
-                <h2 className="text-2xl font-bold mb-2">{t('docs.welcome')}</h2>
-                <p className="text-bolt-elements-textSecondary">{t('docs.welcome.description')}</p>
+          <div className="min-h-0 w-full flex-1 overflow-auto flex">
+            {/* 左邊目錄 */}
+            <div className="w-64 shrink-0 border-r border-bolt-elements-borderColor p-4 overflow-y-auto">
+              <div className="space-y-1 text-sm">
+                <div className="font-semibold text-bolt-elements-textPrimary mb-2">{t('docs.toc')}</div>
+                
+                <div className="font-medium text-bolt-elements-textPrimary">{t('docs.toc.welcome')}</div>
+                
+                <div className="font-medium text-bolt-elements-textPrimary mt-3">{t('docs.toc.features')}</div>
+                
+                <div className="font-medium text-bolt-elements-textPrimary mt-3">{t('docs.toc.quickstart')}</div>
+                <div className="pl-3 text-bolt-elements-textSecondary">
+                  <div>{t('docs.toc.step1')}</div>
+                  <div>{t('docs.toc.step2')}</div>
+                  <div>{t('docs.toc.step3')}</div>
+                </div>
+                
+                <div className="font-medium text-bolt-elements-textPrimary mt-3">{t('docs.toc.accounts')}</div>
+                <div className="pl-3 text-bolt-elements-textSecondary">
+                  <div>{t('docs.toc.login')}</div>
+                  <div>{t('docs.toc.quota')}</div>
+                </div>
+                
+                <div className="font-medium text-bolt-elements-textPrimary mt-3">{t('docs.toc.deploy')}</div>
+                <div className="pl-3 text-bolt-elements-textSecondary">
+                  <div>{t('docs.toc.hosting')}</div>
+                  <div>{t('docs.toc.custom.domain')}</div>
+                </div>
+                
+                <div className="font-medium text-bolt-elements-textPrimary mt-3">{t('docs.toc.billing')}</div>
+                <div className="pl-3 text-bolt-elements-textSecondary">
+                  <div>{t('docs.toc.pricing')}</div>
+                  <div>{t('docs.toc.paypal')}</div>
+                </div>
               </div>
+            </div>
 
-              {/* 主要功能區塊 */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">{t('docs.features')}</h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2">
-                    <span className="text-accent-600">•</span>
-                    <span>{t('docs.feature.1')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-accent-600">•</span>
-                    <span>{t('docs.feature.2')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-accent-600">•</span>
-                    <span>{t('docs.feature.3')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-accent-600">•</span>
-                    <span>{t('docs.feature.4')}</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-accent-600">•</span>
-                    <span>{t('docs.feature.5')}</span>
-                  </li>
-                </ul>
-              </div>
+            {/* 右邊內容 */}
+            <div className="flex-1 overflow-y-auto p-8">
+              <div className="max-w-3xl space-y-6">
+                {/* 歡迎區塊 */}
+                <div>
+                  <h1 className="text-3xl font-bold mb-4">{t('docs.welcome')}</h1>
+                  <p className="text-bolt-elements-textSecondary leading-relaxed">{t('docs.welcome.description')}</p>
+                </div>
 
-              {/* 快速開始區塊 */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">{t('docs.quickstart')}</h3>
-                <ol className="space-y-2 text-sm list-decimal list-inside">
-                  <li>{t('docs.quickstart.1')}</li>
-                  <li>{t('docs.quickstart.2')}</li>
-                  <li>{t('docs.quickstart.3')}</li>
-                </ol>
+                {/* 主要功能區塊 */}
+                <div>
+                  <h2 className="text-xl font-semibold mb-3">{t('docs.features')}</h2>
+                  <ul className="space-y-2 text-sm leading-relaxed">
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent-600 mt-1">•</span>
+                      <span>{t('docs.feature.1')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent-600 mt-1">•</span>
+                      <span>{t('docs.feature.2')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent-600 mt-1">•</span>
+                      <span>{t('docs.feature.3')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent-600 mt-1">•</span>
+                      <span>{t('docs.feature.4')}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent-600 mt-1">•</span>
+                      <span>{t('docs.feature.5')}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* 快速開始區塊 */}
+                <div>
+                  <h2 className="text-xl font-semibold mb-3">{t('docs.quickstart')}</h2>
+                  <ol className="space-y-3 text-sm leading-relaxed list-decimal list-inside">
+                    <li>{t('docs.quickstart.1')}</li>
+                    <li>{t('docs.quickstart.2')}</li>
+                    <li>{t('docs.quickstart.3')}</li>
+                  </ol>
+                </div>
               </div>
             </div>
           </div>
