@@ -159,8 +159,8 @@ export default class OpenAILikeProvider extends BaseProvider {
     const { model, serverEnv, apiKeys, providerSettings } = options;
     const envRecord = this.convertEnvToRecord(serverEnv);
 
-    // 直接硬編碼配置，先用於測試 - 換用備用地址
-    const baseUrl = 'https://api.lk666.ai/v1';
+    // 直接硬編碼配置，先用於測試 - 改回主地址
+    const baseUrl = 'https://api.lk888.ai/v1';
     const apiKey = 'sk-99c56f9033eda1a96cbc0b88dbb996b69ca93b2f832e0ed5';
 
     if (!baseUrl || !apiKey) {
