@@ -84,6 +84,12 @@ export async function selectContext(props: {
     return !ig.ignores(relPath);
   });
 
+  // 如果沒有文件，直接返回空的 context，避免調用 AI 出錯
+  if (filePaths.length === 0) {
+    logger.info('select-context: No files to select from, returning empty context');
+    return {};
+  }
+
   let context = '';
 
   const currrentFiles: string[] = [];
