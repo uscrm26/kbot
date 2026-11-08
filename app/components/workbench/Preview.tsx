@@ -978,11 +978,11 @@ export const Preview = memo(({ selectedElement, setSelectedElement }: PreviewPro
                           );
                         }}
                       >
-                        <span>Open in new window</span>
+                        <span>在新窗口打開</span>
                         <div className="i-ph:browser h-5 w-4" />
                       </button>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-bolt-elements-textTertiary">Show Device Frame</span>
+                        <span className="text-xs text-bolt-elements-textTertiary">顯示裝置框架</span>
                         <button
                           className={`w-10 h-5 rounded-full transition-colors duration-200 ${
                             showDeviceFrame ? 'bg-[#6D28D9]' : 'bg-gray-300 dark:bg-gray-700'
@@ -1000,7 +1000,7 @@ export const Preview = memo(({ selectedElement, setSelectedElement }: PreviewPro
                         </button>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-bolt-elements-textTertiary">Landscape Mode</span>
+                        <span className="text-xs text-bolt-elements-textTertiary">橫向模式</span>
                         <button
                           className={`w-10 h-5 rounded-full transition-colors duration-200 ${
                             isLandscape ? 'bg-[#6D28D9]' : 'bg-gray-300 dark:bg-gray-700'
@@ -1190,7 +1190,7 @@ export const Preview = memo(({ selectedElement, setSelectedElement }: PreviewPro
             </>
           ) : (
             <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-              No preview available
+              沒有可用的預覽
             </div>
           )}
 
