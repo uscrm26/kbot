@@ -29,8 +29,10 @@ export function checkRateLimit(
 ): { allowed: boolean; resetTime?: number; unavailable?: boolean } {
   const clientIP = getTrustedClientIP(request, context);
 
+  // If we can't get a trusted client IP, skip rate limiting instead of blocking
+  // This is better than showing a 503 error to users
   if (!clientIP) {
-    return { allowed: false, unavailable: true };
+    return { allowed: true };
   }
 
   const key = `${clientIP}:${endpoint}`;
