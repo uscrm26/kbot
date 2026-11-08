@@ -12,7 +12,7 @@ const logger = createScopedLogger('LLMManager');
  * unregistered, so its models never reach the model picker.
  */
 const ENABLED_PROVIDERS = new Set([
-  'OpenAILike',
+  'K-bot Agent',
 ]);
 
 export class LLMManager {
@@ -244,11 +244,11 @@ export class LLMManager {
   }
 
   getDefaultProvider(): BaseProvider {
-    // 優先使用 OpenAILike（豆包 API）
-    const openAILike = this._providers.get('OpenAILike');
+    // 優先使用 K-bot Agent（豆包 API）
+    const kbotAgent = this._providers.get('K-bot Agent');
 
-    if (openAILike) {
-      return openAILike;
+    if (kbotAgent) {
+      return kbotAgent;
     }
 
     const firstProvider = this._providers.values().next().value;
