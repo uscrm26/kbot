@@ -142,12 +142,12 @@ export const ChatImpl = memo(
     const [llmErrorAlert, setLlmErrorAlert] = useState<LlmErrorAlertType | undefined>(undefined);
 
     const [model, setModel] = useState(() => {
-      const savedModel = Cookies.get('selectedModel');
-      return savedModel || DEFAULT_MODEL;
+      // 強制使用默認模型，不讀取 Cookie 裡的保存值
+      return DEFAULT_MODEL;
     });
     const [provider, setProvider] = useState(() => {
-      const savedProvider = Cookies.get('selectedProvider');
-      return (PROVIDER_LIST.find((p) => p.name === savedProvider) || DEFAULT_PROVIDER) as ProviderInfo;
+      // 強制使用默認 provider（OpenAILike / K-bot Agent），不讀取 Cookie 裡的保存值
+      return DEFAULT_PROVIDER as ProviderInfo;
     });
 
     const { showChat } = useStore(chatStore);
