@@ -83,7 +83,7 @@ export function TopNav() {
           onClick={() => alert('登入功能即將上線！')}
           className="px-3 py-1.5 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
         >
-          {nav.login}
+          登入測試
         </button>
         <button
           type="button"
