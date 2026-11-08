@@ -73,7 +73,7 @@ export function TopNav() {
 
         <button
           type="button"
-          onClick={() => window.location.href = '/admin'}
+          onClick={() => window.location.href = '/auth'}
           className="px-3 py-1.5 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
         >
           {nav.login}

@@ -30,6 +30,9 @@ export function initDatabase() {
       avatar_url TEXT,
       role TEXT NOT NULL DEFAULT 'user', -- admin, user
       is_active BOOLEAN NOT NULL DEFAULT 1,
+      google_id TEXT UNIQUE,
+      apple_id TEXT UNIQUE,
+      github_id TEXT UNIQUE,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       last_login_at DATETIME
     )
