@@ -136,7 +136,7 @@ export function toSafeStreamErrorMessage(error: unknown): string {
   const statusCode =
     typeof error === 'object' && error !== null && 'statusCode' in error ? error.statusCode : undefined;
 
-  logger.error(`Streaming provider error (${error instanceof Error ? error.name : 'UnknownError'})`);
+  logger.error(`Streaming provider error (${error instanceof Error ? error.name : 'UnknownError'}):`, providerMessage);
 
   if ((error instanceof Error && error.name === 'TimeoutError') || /timeout|timed\s*out/.test(normalizedMessage)) {
     return 'Custom error: The AI provider stopped responding before the next step completed. Completed file changes and tool results are preserved. Retry to continue, or select a different model.';
