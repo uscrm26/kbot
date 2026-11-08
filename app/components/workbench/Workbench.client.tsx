@@ -52,15 +52,15 @@ const viewTransition = { ease: cubicEasingFn };
 const sliderOptions: SliderOptions<WorkbenchViewType> = {
   left: {
     value: 'code',
-    text: 'Code',
+    text: '程式碼',
   },
   middle: {
     value: 'diff',
-    text: 'Diff',
+    text: '差異',
   },
   right: {
     value: 'preview',
-    text: 'Preview',
+    text: '預覽',
   },
 };
 
