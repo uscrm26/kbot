@@ -114,11 +114,14 @@ const fileMapSchema = z
     message: `at most ${REQUEST_LIMITS.MAX_FILES} files`,
   });
 
-const designSchemeSchema = z.looseObject({
-  palette: z.record(z.string().max(64), z.string().max(64)),
-  features: z.array(z.string().max(64)).max(64),
-  font: z.array(z.string().max(64)).max(64),
-});
+const designSchemeSchema = z
+  .looseObject({
+    palette: z.record(z.string().max(64), z.string().max(64)),
+    features: z.array(z.string().max(64)).max(64),
+    font: z.array(z.string().max(64)).max(64),
+  })
+  .nullable()
+  .optional();
 
 const providerSchema = z.looseObject({
   name: z.string().min(1).max(128),
