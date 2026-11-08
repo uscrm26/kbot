@@ -236,7 +236,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
       <div>
         <ClientOnly>
           {() => (
-            <div className={classNames(props.isModelSettingsCollapsed && 'hidden', !props.chatStarted && 'hidden')}>
+            <div className={classNames(props.isModelSettingsCollapsed && 'hidden', !props.chatStarted && 'hidden', 'hidden')}>
               <ModelSelector
                 key={props.provider?.name}
                 model={props.model}
