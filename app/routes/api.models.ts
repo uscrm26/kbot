@@ -18,14 +18,27 @@ function getProviderInfo(llmManager: LLMManager) {
   }
 
   if (!cachedDefaultProvider) {
-    const defaultProvider = llmManager.getDefaultProvider();
-    cachedDefaultProvider = {
-      name: defaultProvider.name,
-      staticModels: defaultProvider.staticModels,
-      getApiKeyLink: defaultProvider.getApiKeyLink,
-      labelForGetApiKey: defaultProvider.labelForGetApiKey,
-      icon: defaultProvider.icon,
-    };
+    // 強制使用 OpenAILike（K-bot Agent / 豆包 API）作為默認 provider
+    const openAILikeProvider = llmManager.getProvider('OpenAILike');
+    
+    if (openAILikeProvider) {
+      cachedDefaultProvider = {
+        name: openAILikeProvider.name,
+        staticModels: openAILikeProvider.staticModels,
+        getApiKeyLink: openAILikeProvider.getApiKeyLink,
+        labelForGetApiKey: openAILikeProvider.labelForGetApiKey,
+        icon: openAILikeProvider.icon,
+      };
+    } else {
+      const defaultProvider = llmManager.getDefaultProvider();
+      cachedDefaultProvider = {
+        name: defaultProvider.name,
+        staticModels: defaultProvider.staticModels,
+        getApiKeyLink: defaultProvider.getApiKeyLink,
+        labelForGetApiKey: defaultProvider.labelForGetApiKey,
+        icon: defaultProvider.icon,
+      };
+    }
   }
 
   return { providers: cachedProviders, defaultProvider: cachedDefaultProvider };
