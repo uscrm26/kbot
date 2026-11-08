@@ -3,11 +3,13 @@ import { getNav, type NavGroup } from '~/lib/nav-config';
 import { setLanguage, getLanguage, getAvailableLanguages } from '~/lib/i18n';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { classNames } from '~/utils/classNames';
+import { AuthPage } from '~/components/auth/AuthPage';
 
 export function TopNav() {
   const nav = getNav();
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [langOpen, setLangOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const currentLang = getLanguage();
   const languages = getAvailableLanguages();
 
@@ -78,7 +80,7 @@ export function TopNav() {
 
         <button
           type="button"
-          onClick={() => window.location.href = '/auth'}
+          onClick={() => setAuthOpen(true)}
           className="px-3 py-1.5 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
         >
           {nav.login}
@@ -90,6 +92,27 @@ export function TopNav() {
           {nav.start}
         </button>
       </div>
+
+      {/* 登入模態框 */}
+      {authOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setAuthOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setAuthOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <div className="i-ph:x text-xl" />
+            </button>
+            <AuthPage onSuccess={() => setAuthOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
