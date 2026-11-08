@@ -105,7 +105,7 @@ export const EditorPanel = memo(
                         'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
                       )}
                     >
-                      Locks
+                      鎖定
                     </Tabs.Trigger>
                   </Tabs.List>
                 </div>

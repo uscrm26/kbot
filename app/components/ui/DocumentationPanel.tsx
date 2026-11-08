@@ -28,9 +28,9 @@ export function DocumentationPanel({ open, onClose }: DocumentationPanelProps) {
                 <div className="i-ph:book-open-text h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <Dialog.Title className="truncate text-sm font-semibold">bolt.diy Manual</Dialog.Title>
+                <Dialog.Title className="truncate text-sm font-semibold">K-bot 使用手冊</Dialog.Title>
                 <Dialog.Description className="truncate text-xs text-bolt-elements-textSecondary">
-                  Product documentation and guides
+                  產品說明與使用指南
                 </Dialog.Description>
               </div>
             </div>
@@ -43,7 +43,7 @@ export function DocumentationPanel({ open, onClose }: DocumentationPanelProps) {
                 className="inline-flex items-center gap-2 rounded-lg border border-bolt-elements-borderColor px-3 py-2 text-xs font-medium text-bolt-elements-textSecondary transition-colors hover:bg-bolt-elements-background-depth-2 hover:text-bolt-elements-textPrimary"
               >
                 <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">Open in new tab</span>
+                <span className="hidden sm:inline">在新分頁開啟</span>
               </a>
               <Dialog.Close asChild>
                 <button

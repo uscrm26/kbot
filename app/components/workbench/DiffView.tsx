@@ -362,12 +362,12 @@ const NoChangesView = memo(
     <div className="h-full flex flex-col items-center justify-center p-4">
       <div className="text-center text-bolt-elements-textTertiary">
         <div className="i-ph:files text-4xl text-green-400 mb-2 mx-auto" />
-        <p className="font-medium text-bolt-elements-textPrimary">Files are identical</p>
-        <p className="text-sm mt-1">Both versions match exactly</p>
+        <p className="font-medium text-bolt-elements-textPrimary">檔案完全相同</p>
+        <p className="text-sm mt-1">兩個版本完全一致</p>
       </div>
       <div className="mt-4 w-full max-w-2xl bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor overflow-hidden">
         <div className="p-2 text-xs font-bold text-bolt-elements-textTertiary border-b border-bolt-elements-borderColor">
-          Current Content
+          目前內容
         </div>
         <div className="overflow-auto max-h-96">
           {beforeCode.split('\n').map((line, index) => (
