@@ -12,27 +12,6 @@ const logger = createScopedLogger('LLMManager');
  * unregistered, so its models never reach the model picker.
  */
 const ENABLED_PROVIDERS = new Set([
-  'OpenRouter',
-  'Anthropic',
-  'OpenAI',
-  'Google',
-  'Groq',
-  'HuggingFace',
-  'Cohere',
-  'Mistral',
-  'Perplexity',
-  'Deepseek',
-  'xAI',
-  'Together',
-  'Fireworks',
-  'Cerebras',
-  'AmazonBedrock',
-  'Github',
-  'Moonshot',
-  'Hyperbolic',
-  'Z.ai',
-  'Ollama',
-  'LMStudio',
   'OpenAILike',
 ]);
 
