@@ -20,6 +20,7 @@ import {
 import { IconButton } from '~/components/ui/IconButton';
 import { Slider, type SliderOptions } from '~/components/ui/Slider';
 import useViewport from '~/lib/hooks';
+import { t } from '~/lib/i18n';
 import { chatStore } from '~/lib/stores/chat';
 import { usePreviewStore } from '~/lib/stores/previews';
 import { streamingState } from '~/lib/stores/streaming';
@@ -52,15 +53,15 @@ const viewTransition = { ease: cubicEasingFn };
 const sliderOptions: SliderOptions<WorkbenchViewType> = {
   left: {
     value: 'code',
-    text: '程式碼',
+    text: t('workbench.code'),
   },
   middle: {
     value: 'diff',
-    text: '差異',
+    text: t('workbench.diff'),
   },
   right: {
     value: 'preview',
-    text: '預覽',
+    text: t('workbench.preview'),
   },
 };
 
@@ -463,7 +464,7 @@ export const Workbench = memo(
                             disabled={isSyncing || streaming}
                             className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
                           >
-                            {isSyncing ? '同步中...' : '同步'}
+                            {isSyncing ? t('workbench.syncing') : t('workbench.sync')}
                             <span className={classNames('i-ph:caret-down transition-transform')} />
                           </DropdownMenu.Trigger>
                           <DropdownMenu.Content
@@ -491,7 +492,7 @@ export const Workbench = memo(
                                 ) : (
                                   <div className="i-ph:cloud-arrow-down" />
                                 )}
-                                <span>{isSyncing ? '同步中...' : '同步檔案'}</span>
+                                <span>{isSyncing ? t('workbench.syncing') : t('workbench.sync.files')}</span>
                               </div>
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>

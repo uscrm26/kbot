@@ -16,6 +16,7 @@ import {
 } from '~/components/editor/codemirror/CodeMirrorEditor';
 import { PanelHeader } from '~/components/ui/PanelHeader';
 import { PanelHeaderButton } from '~/components/ui/PanelHeaderButton';
+import { t } from '~/lib/i18n';
 import type { FileMap } from '~/lib/stores/files';
 import { themeStore } from '~/lib/stores/theme';
 import type { FileHistory } from '~/types/actions';
@@ -89,7 +90,7 @@ export const EditorPanel = memo(
                         'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
                       )}
                     >
-                      檔案
+                      {t('workbench.files')}
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value="search"
@@ -97,7 +98,7 @@ export const EditorPanel = memo(
                         'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
                       )}
                     >
-                      搜尋
+                      {t('workbench.search')}
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value="locks"
@@ -105,7 +106,7 @@ export const EditorPanel = memo(
                         'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
                       )}
                     >
-                      鎖定
+                      {t('workbench.locks')}
                     </Tabs.Trigger>
                   </Tabs.List>
                 </div>
