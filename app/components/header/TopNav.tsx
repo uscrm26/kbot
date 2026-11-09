@@ -35,9 +35,15 @@ export function TopNav() {
               key={link.id}
               type="button"
               onClick={() => {
-                if (link.id === 'pricing') {
-                  window.location.href = '/pricing';
-                }
+                const hrefMap: Record<string, string> = {
+                  tools: '/product',
+                  templates: '/templates',
+                  cases: '/cases',
+                  pricing: '/pricing',
+                  articles: '/articles',
+                  docs: '/docs',
+                };
+                window.location.href = hrefMap[link.id] || '/product';
               }}
               className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap"
             >
@@ -239,6 +245,9 @@ function GroupMenu({
             <button
               key={child.id}
               type="button"
+              onClick={() => {
+                window.location.href = '/product';
+              }}
               className="flex w-full text-left px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               {child.label}

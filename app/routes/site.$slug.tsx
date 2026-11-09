@@ -32,7 +32,15 @@ function normalizeKey(filePath: string): string {
 
 // 公開網站托管路由，直接從網站記錄中的檔案提供內容
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const slug = params.slug;
+  const splat = params['*'];
+
+  if (!splat) {
+    return new Response('Site not found', { status: 404 });
+  }
+
+  const segments = splat.split('/').map((seg) => decodeURIComponent(seg));
+  const slug = segments[0];
+  const rest = segments.slice(1).join('/');
 
   if (!slug) {
     return new Response('Site not found', { status: 404 });
@@ -44,8 +52,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return new Response('Site not found', { status: 404 });
   }
 
-  const url = new URL(request.url);
-  let requestedPath = decodeURIComponent(url.pathname.replace(`/site/${slug}`, ''));
+  let requestedPath = rest ? `/${rest}` : '/index.html';
 
   if (requestedPath === '' || requestedPath === '/') {
     requestedPath = '/index.html';

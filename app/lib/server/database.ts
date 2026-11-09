@@ -44,6 +44,9 @@ interface Website {
   description?: string;
   slug?: string;
   custom_domain?: string;
+  verification_token?: string;
+  verification_mode?: 'dns' | 'demo';
+  domain_verified?: boolean;
   preview_url?: string;
   status: 'draft' | 'published' | 'disabled';
   files?: any;

@@ -15,7 +15,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return Response.json({ error: 'Method not allowed' }, { status: 405 });
   }
 
-  const body = await request.json();
+  const body: any = await request.json();
   const { websiteId } = body;
 
   if (!websiteId) {
@@ -28,7 +28,21 @@ export async function action({ request }: ActionFunctionArgs) {
     return Response.json({ error: 'Website or custom domain not found' }, { status: 404 });
   }
 
-  // 解析網域的 TXT 記錄
+  // Demo 模式直接模擬 DNS 驗證成功，無需真實記錄
+  if (website.verification_mode === 'demo') {
+    websiteOperations.updateWebsite(websiteId, {
+      domain_verified: true,
+      status: 'published',
+    });
+
+    return Response.json({
+      verified: true,
+      mode: 'demo',
+      customDomain: website.custom_domain,
+      simulatedRecords: [website.verification_token],
+    });
+  }
+
   let txtRecords: string[] = [];
 
   try {
@@ -44,14 +58,20 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  // 檢查是否包含 K-bot 驗證標記
-  const hasVerifyRecord = txtRecords.some((record) => record.startsWith('kbot-verify'));
+  const expectedToken = website.verification_token;
+  const hasVerifyRecord = expectedToken
+    ? txtRecords.includes(expectedToken)
+    : txtRecords.some((record) => record.startsWith('kbot-verify'));
 
   if (hasVerifyRecord) {
-    websiteOperations.updateWebsite(websiteId, { status: 'published' });
+    websiteOperations.updateWebsite(websiteId, {
+      domain_verified: true,
+      status: 'published',
+    });
 
     return Response.json({
       verified: true,
+      mode: 'dns',
       customDomain: website.custom_domain,
     });
   }
