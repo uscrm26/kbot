@@ -457,7 +457,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           <WorkbenchReopenButton onClick={() => workbenchStore.showWorkbench.set(true)} />
         )}
         <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
-          <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
+          <div
+            className={classNames(
+              styles.Chat,
+              'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full lg:pr-[var(--panel-gap)]',
+            )}
+          >
             {!chatStarted && (
               <div id="intro" className="mt-[16vh] max-w-4xl mx-auto text-center px-4 lg:px-0 relative">
                 <h1 className="text-4xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in leading-tight tracking-tight">
