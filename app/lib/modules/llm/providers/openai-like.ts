@@ -52,9 +52,9 @@ export default class OpenAILikeProvider extends BaseProvider {
 
       const res = (await response.json()) as OpenAIModelsResponse;
 
-      // 只保留豆包大模型，不接入其他廠商模型
+      // 只保留高性價比的 deepseek-v4-flash 輕量模型，不接入其他廠商或高價模型
       return res.data
-        .filter((model) => model.id.toLowerCase().startsWith('doubao'))
+        .filter((model) => model.id.toLowerCase() === 'deepseek-v4-flash')
         .map((model) => ({
           name: model.id,
           label: model.id,
@@ -162,7 +162,7 @@ export default class OpenAILikeProvider extends BaseProvider {
     const { model, serverEnv, apiKeys, providerSettings } = options;
     const envRecord = this.convertEnvToRecord(serverEnv);
 
-    // 直接使用豆包大模型，配置由統一環境提供
+    // 使用高性價比的 deepseek-v4-flash，配置由統一環境提供
     const baseUrl = 'https://api.lk888.ai/v1';
     const apiKey = 'sk-01241153322234f2c0377eb13f35221c57d1af9019c3fb26';
 

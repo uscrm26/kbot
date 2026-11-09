@@ -13,7 +13,8 @@
       "DATA_DIR": "/app/data",
       "OPENAI_LIKE_API_BASE_URL": "https://api.lk888.ai/v1",
       "OPENAI_LIKE_API_KEY": "sk-01241153322234f2c0377eb13f35221c57d1af9019c3fb26",
-      "DEFAULT_MODEL": "doubao-seed-2-1-pro-260628",
+      "OPENAI_LIKE_API_MODELS": "deepseek-v4-flash:8000",
+      "DEFAULT_MODEL": "deepseek-v4-flash",
       "BOLT_TELEMETRY_DISABLED": "1"
     }
   }

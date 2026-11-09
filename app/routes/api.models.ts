@@ -18,7 +18,7 @@ function getProviderInfo(llmManager: LLMManager) {
   }
 
   if (!cachedDefaultProvider) {
-    // 強制使用 OpenAILike（K-bot Agent / 豆包 API）作為默認 provider
+    // 強制使用 OpenAILike（K-bot 專用高性價比模型 API）作為默認 provider
     const openAILikeProvider = llmManager.getProvider('OpenAILike');
     
     if (openAILikeProvider) {

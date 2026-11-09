@@ -6,7 +6,7 @@ export const WORK_DIR = `/home/${WORK_DIR_NAME}`;
 export const MODIFICATIONS_TAG_NAME = 'bolt_file_modifications';
 export const MODEL_REGEX = /^\[Model: (.*?)\]\n\n/;
 export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
-export const DEFAULT_MODEL = 'doubao-seed-2-1-pro-260628';
+export const DEFAULT_MODEL = 'deepseek-v4-flash';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 export const TOOL_EXECUTION_APPROVAL = {
   APPROVE: 'Yes, approved.',
@@ -19,7 +19,7 @@ export const TOOL_EXECUTION_ERROR = 'Error: An error occured while calling tool'
 const llmManager = LLMManager.getInstance(import.meta.env);
 
 export const PROVIDER_LIST = llmManager.getAllProviders();
-// 強制使用 OpenAILike 作為默認 provider（K-bot Agent / 豆包 API）
+// 強制使用 OpenAILike 作為默認 provider（K-bot 專用高性價比模型 API）
 export const DEFAULT_PROVIDER = llmManager.getProvider('OpenAILike') || llmManager.getDefaultProvider();
 
 export const providerBaseUrlEnvKeys: Record<string, { baseUrlKey?: string; apiTokenKey?: string }> = {};
