@@ -31,7 +31,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
         }),
       });
 
-      const data = await response.json();
+      const data: any = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || 'Something went wrong');

@@ -4,14 +4,19 @@ import { setLanguage, getLanguage, getAvailableLanguages } from '~/lib/i18n';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { classNames } from '~/utils/classNames';
 import { AuthPage } from '~/components/auth/AuthPage';
+import { useAuthStore } from '~/lib/stores/auth';
 
 export function TopNav() {
   const nav = getNav();
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [langOpen, setLangOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const currentLang = getLanguage();
   const languages = getAvailableLanguages();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   return (
     <div className="flex items-center gap-2 w-full bg-white/90 backdrop-blur-xl px-6 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border-b border-gray-100">
@@ -78,15 +83,75 @@ export function TopNav() {
           )}
         </div>
 
+        {user ? (
+          <div className="relative" onMouseLeave={() => setUserMenuOpen(false)}>
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen((v) => !v)}
+              className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+            >
+              <div className="i-ph:user-circle text-lg" />
+              <span>{user.name}</span>
+              <div className="i-ph:caret-down text-xs" />
+            </button>
+            {userMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 min-w-[210px] rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg z-50 p-1.5">
+                <div className="px-3 py-2 border-b border-bolt-elements-borderColor mb-1">
+                  <div className="text-xs text-bolt-elements-textSecondary">{nav.compute}</div>
+                  <div className="text-sm font-semibold text-accent-600">
+                    {Math.round(user.k_compute_balance)}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    window.location.href = '/dashboard';
+                  }}
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive"
+                >
+                  <div className="i-ph:globe text-base" />
+                  {nav.mySites}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    window.location.href = '/pricing';
+                  }}
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive"
+                >
+                  <div className="i-ph:currency-circle-dollar text-base" />
+                  {nav.upgrade}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    logout();
+                  }}
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-md text-red-500 hover:bg-red-50"
+                >
+                  <div className="i-ph:sign-out text-base" />
+                  {nav.logout}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAuthOpen(true)}
+            className="px-3 py-1.5 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+          >
+            {nav.login}
+          </button>
+        )}
         <button
           type="button"
-          onClick={() => alert('登入功能即將上線！')}
-          className="px-3 py-1.5 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
-        >
-          登入測試
-        </button>
-        <button
-          type="button"
+          onClick={() => {
+            window.location.href = '/';
+          }}
           className="px-4 py-1.5 text-sm rounded-lg bg-accent-600 text-white hover:bg-accent-700 transition-colors font-medium"
         >
           {nav.start}
@@ -95,21 +160,26 @@ export function TopNav() {
 
       {/* 登入模態框 */}
       {authOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           onClick={() => setAuthOpen(false)}
         >
-          <div 
-            className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto"
+          <div
+            className="relative bg-white rounded-2xl shadow-xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setAuthOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
             >
               <div className="i-ph:x text-xl" />
             </button>
-            <AuthPage onSuccess={() => setAuthOpen(false)} />
+            <AuthPage
+              onSuccess={(authUser, session) => {
+                setAuth(authUser, session);
+                setAuthOpen(false);
+              }}
+            />
           </div>
         </div>
       )}

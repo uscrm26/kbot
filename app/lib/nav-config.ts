@@ -17,7 +17,11 @@ export interface NavStructure {
   groups: NavGroup[];
   links: NavTopLink[];
   login: string;
+  logout: string;
   start: string;
+  mySites: string;
+  compute: string;
+  upgrade: string;
 }
 
 type Dict = Record<string, string>;
@@ -71,7 +75,11 @@ const LABELS: Record<string, Dict> = {
     articles: '文章',
     docs: '文件',
     login: '登入',
+    logout: '登出',
     start: '開始',
+    mySites: '我的網站',
+    compute: 'K 算力',
+    upgrade: '升級方案',
   },
   'zh-Hans': {
     product: '产品',
@@ -96,7 +104,11 @@ const LABELS: Record<string, Dict> = {
     articles: '文章',
     docs: '文件',
     login: '登录',
+    logout: '退出',
     start: '开始',
+    mySites: '我的网站',
+    compute: 'K 算力',
+    upgrade: '升级套餐',
   },
   en: {
     product: 'Product',
@@ -121,7 +133,11 @@ const LABELS: Record<string, Dict> = {
     articles: 'Articles',
     docs: 'Docs',
     login: 'Log in',
+    logout: 'Log out',
     start: 'Get Started',
+    mySites: 'My Sites',
+    compute: 'K Compute',
+    upgrade: 'Upgrade Plan',
   },
   ja: {
     product: '製品',
@@ -146,7 +162,11 @@ const LABELS: Record<string, Dict> = {
     articles: '記事',
     docs: 'ドキュメント',
     login: 'ログイン',
+    logout: 'ログアウト',
     start: '始める',
+    mySites: 'マイサイト',
+    compute: 'K 算力',
+    upgrade: 'プラン変更',
   },
   ko: {
     product: '제품',
@@ -171,7 +191,11 @@ const LABELS: Record<string, Dict> = {
     articles: '아티클',
     docs: '문서',
     login: '로그인',
+    logout: '로그아웃',
     start: '시작하기',
+    mySites: '내 사이트',
+    compute: 'K 컴퓨트',
+    upgrade: '요금제 업그레이드',
   },
 };
 
@@ -192,6 +216,10 @@ export function getNav(): NavStructure {
     groups,
     links,
     login: label('login'),
+    logout: label('logout'),
     start: label('start'),
+    mySites: label('mySites'),
+    compute: label('compute'),
+    upgrade: label('upgrade'),
   };
 }

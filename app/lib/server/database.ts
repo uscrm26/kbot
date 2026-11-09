@@ -42,6 +42,7 @@ interface Website {
   user_id: number;
   name: string;
   description?: string;
+  slug?: string;
   custom_domain?: string;
   preview_url?: string;
   status: 'draft' | 'published' | 'disabled';
@@ -191,6 +192,10 @@ export const websiteOperations = {
     return db.websites.filter(w => w.user_id === userId);
   },
 
+  findBySlug(slug: string): Website | undefined {
+    return db.websites.find(w => w.slug === slug);
+  },
+
   createWebsite(website: Omit<Website, 'id' | 'created_at' | 'updated_at' | 'status'>): Website {
     const newWebsite: Website = {
       id: db.nextWebsiteId++,
@@ -247,6 +252,11 @@ export const sessionOperations = {
 
   findByToken(token: string): Session | undefined {
     return db.sessions.find(s => s.token === token);
+  },
+
+  deleteByToken(token: string): void {
+    db.sessions = db.sessions.filter(s => s.token !== token);
+    saveDatabase(db);
   },
 
   deleteExpiredSessions() {
