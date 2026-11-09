@@ -52,12 +52,15 @@ export default class OpenAILikeProvider extends BaseProvider {
 
       const res = (await response.json()) as OpenAIModelsResponse;
 
-      return res.data.map((model) => ({
-        name: model.id,
-        label: model.id,
-        provider: this.name,
-        maxTokenAllowed: 8000,
-      }));
+      // 只保留豆包大模型，不接入其他廠商模型
+      return res.data
+        .filter((model) => model.id.toLowerCase().startsWith('doubao'))
+        .map((model) => ({
+          name: model.id,
+          label: model.id,
+          provider: this.name,
+          maxTokenAllowed: 8000,
+        }));
     } catch (error) {
       logger.info(`${this.name}: Could not fetch /models endpoint, checking fallback env`, error);
 
@@ -159,9 +162,9 @@ export default class OpenAILikeProvider extends BaseProvider {
     const { model, serverEnv, apiKeys, providerSettings } = options;
     const envRecord = this.convertEnvToRecord(serverEnv);
 
-    // 直接硬編碼配置，先用於測試 - 改回主地址
+    // 直接使用豆包大模型，配置由統一環境提供
     const baseUrl = 'https://api.lk888.ai/v1';
-    const apiKey = 'sk-99c56f9033eda1a96cbc0b88dbb996b69ca93b2f832e0ed5';
+    const apiKey = 'sk-01241153322234f2c0377eb13f35221c57d1af9019c3fb26';
 
     if (!baseUrl || !apiKey) {
       throw new Error(`Missing configuration for ${this.name} provider`);

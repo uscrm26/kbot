@@ -12,7 +12,7 @@
     "env": {
       "DATA_DIR": "/app/data",
       "OPENAI_LIKE_API_BASE_URL": "https://api.lk888.ai/v1",
-      "OPENAI_LIKE_API_KEY": "sk-99c56f9033eda1a96cbc0b88dbb996b69ca93b2f832e0ed5",
+      "OPENAI_LIKE_API_KEY": "sk-01241153322234f2c0377eb13f35221c57d1af9019c3fb26",
       "DEFAULT_MODEL": "doubao-seed-2-1-pro-260628",
       "BOLT_TELEMETRY_DISABLED": "1"
     }
