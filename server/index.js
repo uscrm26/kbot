@@ -72,7 +72,7 @@ async function start() {
   const server = http.createServer((req, res) => {
     // 兜底：部分代理層不會觸發 upgrade 事件，在 request 層直接處理 WebSocket 握手
     if (asrInfo.isASRPath(req.url)) {
-      console.log('[asr-headers]', JSON.stringify(req.headers));
+      console.error('[asr-headers]', JSON.stringify(req.headers));
     }
     if (req.headers.upgrade && asrInfo.isASRPath(req.url)) {
       asrInfo.handleUpgrade(req, req.socket, Buffer.alloc(0));
@@ -87,8 +87,7 @@ async function start() {
   const asrInfo = attachASRProxy(server);
 
   server.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.log(`K-bot server listening on ${PORT}, ASR mode: ${asrInfo.mode}`);
+    console.error(`K-bot server listening on ${PORT}, ASR mode: ${asrInfo.mode}`);
   });
 }
 
