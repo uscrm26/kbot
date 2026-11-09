@@ -70,20 +70,7 @@ async function start() {
   });
 
   const server = http.createServer((req, res) => {
-    res.setHeader('X-Kbot-Server', 'custom-node-0d12f6a');
-
-    // 服務器外殼版本診斷，直接響應，不經過 build
-    if (req.url.startsWith('/server-check')) {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ shell: 'node-custom-server', version: 'shell-460f6ea' }));
-      return;
-    }
-
     // 兜底：部分代理層不會觸發 upgrade 事件，在 request 層直接處理 WebSocket 握手
-    if (asrInfo.isASRPath(req.url)) {
-      console.error('[asr-headers]', JSON.stringify(req.headers));
-    }
     if (req.headers.upgrade && asrInfo.isASRPath(req.url)) {
       asrInfo.handleUpgrade(req, req.socket, Buffer.alloc(0));
       return;
@@ -97,7 +84,8 @@ async function start() {
   const asrInfo = attachASRProxy(server);
 
   server.listen(PORT, () => {
-    console.error(`K-bot server listening on ${PORT}, ASR mode: ${asrInfo.mode}`);
+    // eslint-disable-next-line no-console
+    console.log(`K-bot server listening on ${PORT}, ASR mode: ${asrInfo.mode}`);
   });
 }
 
