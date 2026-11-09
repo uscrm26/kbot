@@ -19,6 +19,7 @@ import { DocumentationPanel } from '~/components/ui/DocumentationPanel';
 import { SettingsButton, HelpButton } from '~/components/ui/SettingsButton';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
+import { t } from '~/lib/i18n';
 import { db, deleteById, getAll, chatId, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
 import { DEFAULT_AVATAR, profileStore } from '~/lib/stores/profile';
 import { classNames } from '~/utils/classNames';
@@ -368,7 +369,7 @@ export const Menu = () => {
           <div className="flex items-center gap-3">
             <HelpButton onClick={() => setIsDocumentationOpen(true)} />
             <span className="font-medium text-sm text-bolt-elements-textPrimary truncate">
-              {profile?.username || 'Guest User'}
+              {profile?.username || t('menu.guest.user')}
             </span>
             <div className="flex items-center justify-center w-[32px] h-[32px] overflow-hidden bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary rounded-full shrink-0">
               <img
@@ -390,7 +391,7 @@ export const Menu = () => {
                 className="flex-1 flex gap-2 items-center bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 rounded-lg px-4 py-2 transition-colors"
               >
                 <span className="inline-block i-ph:plus-circle h-4 w-4" />
-                <span className="text-sm font-medium">Start new chat</span>
+                <span className="text-sm font-medium">{t('menu.new.chat')}</span>
               </a>
               <button
                 onClick={toggleSelectionMode}
@@ -412,14 +413,14 @@ export const Menu = () => {
               <input
                 className="w-full bg-bolt-elements-background-depth-2 relative pl-9 pr-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-bolt-elements-borderColorActive/50 text-sm text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary border border-bolt-elements-borderColor"
                 type="search"
-                placeholder="Search chats..."
+                placeholder={t('menu.search.chats')}
                 onChange={handleSearchChange}
-                aria-label="Search chats"
+                aria-label={t('menu.search.chats')}
               />
             </div>
           </div>
           <div className="flex items-center justify-between text-sm px-4 py-2">
-            <div className="font-medium text-gray-600 dark:text-gray-400">Your Chats</div>
+            <div className="font-medium text-gray-600 dark:text-gray-400">{t('menu.your.chats')}</div>
             {selectionMode && (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={selectAll}>

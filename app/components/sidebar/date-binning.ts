@@ -1,4 +1,5 @@
 import { format, isAfter, isThisWeek, isThisYear, isToday, isYesterday, subDays } from 'date-fns';
+import { t } from '~/lib/i18n';
 import type { ChatHistoryItem } from '~/lib/persistence';
 
 type Bin = { category: string; items: ChatHistoryItem[] };
@@ -31,11 +32,11 @@ export function binDates(_list: ChatHistoryItem[]) {
 
 function dateCategory(date: Date) {
   if (isToday(date)) {
-    return 'Today';
+    return t('menu.today');
   }
 
   if (isYesterday(date)) {
-    return 'Yesterday';
+    return t('menu.yesterday');
   }
 
   if (isThisWeek(date)) {
@@ -46,7 +47,7 @@ function dateCategory(date: Date) {
   const thirtyDaysAgo = subDays(new Date(), 30);
 
   if (isAfter(date, thirtyDaysAgo)) {
-    return 'Past 30 Days';
+    return t('menu.earlier');
   }
 
   if (isThisYear(date)) {
