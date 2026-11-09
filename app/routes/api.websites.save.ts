@@ -20,6 +20,29 @@ if (!fs.existsSync(WEBSITES_DIR)) {
   fs.mkdirSync(WEBSITES_DIR, { recursive: true });
 }
 
+// 由名稱生成 URL 友好的 slug，保留中文、字母與數字
+function slugify(name: string): string {
+  const base = name
+    .normalize('NFKC')
+    .trim()
+    .replace(/[^\w\u3400-\u9fff\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return base || `site-${Date.now()}`;
+}
+
+// 確保 slug 在當前數據庫中唯一
+function uniqueSlug(name: string): string {
+  const base = slugify(name);
+  let candidate = base;
+  let counter = 2;
+  while (websiteOperations.findBySlug(candidate)) {
+    candidate = `${base}-${counter}`;
+    counter += 1;
+  }
+  return candidate;
+}
+
 // 保存網站 API
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== 'POST') {
@@ -64,6 +87,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const newWebsite = websiteOperations.createWebsite({
       user_id: userId,
       name,
+      slug: uniqueSlug(name),
       description,
       files,
       status: 'published',
