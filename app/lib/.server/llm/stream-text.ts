@@ -393,10 +393,28 @@ export async function streamText(props: {
     apiKeys,
     providerSettings,
   });
+
+  // 調試日誌：看看模型的 provider 屬性
+  console.log('=== DEBUG selectedModel ===');
+  console.log('specificationVersion:', selectedModel.specificationVersion);
+  console.log('provider:', selectedModel.provider);
+  console.log('modelId:', selectedModel.modelId);
+  console.log('config provider:', (selectedModel as any).config?.provider);
+  console.log('typeof selectedModel:', typeof selectedModel);
+
   const boundedModel =
     forwardedOptions.streamRetries !== undefined ? withAgentStreamDeadlines(selectedModel) : selectedModel;
+
+  console.log('=== DEBUG boundedModel ===');
+  console.log('provider:', boundedModel.provider);
+
+  const finalModel = onToolCallRetry ? withAgentToolCallRecovery(boundedModel, onToolCallRetry) : boundedModel;
+
+  console.log('=== DEBUG finalModel ===');
+  console.log('provider:', finalModel.provider);
+
   const streamParams = {
-    model: onToolCallRetry ? withAgentToolCallRecovery(boundedModel, onToolCallRetry) : boundedModel,
+    model: finalModel,
     system: [chatMode === 'build' ? systemPrompt : discussPrompt(), additionalSystemInstructions]
       .filter((instruction): instruction is string => typeof instruction === 'string' && instruction.length > 0)
       .join('\n\n'),

@@ -230,6 +230,95 @@ export async function createProjectMcpBridge() {
 
   const server = new McpServer({ name: 'bolt-project', version: '1.0.0' });
   const fileRevisionsReadByModel = new Map<string, string>();
+  const dependencyInstallOperations = new Map<string, Promise<void>>();
+
+  async function pathExists(relativePath: string): Promise<boolean> {
+    const wc = await webcontainer;
+
+    try {
+      await wc.fs.readFile(relativePath);
+      return true;
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return false;
+      }
+
+      throw error;
+    }
+  }
+
+  async function ensureDependenciesInstalled() {
+    if (!(await pathExists('package.json'))) {
+      return;
+    }
+
+    if (await pathExists('node_modules/.package-lock.json')) {
+      return;
+    }
+
+    const installKey = String(bridgeProjectGeneration);
+    const existingOperation = dependencyInstallOperations.get(installKey);
+
+    if (existingOperation) {
+      await existingOperation;
+      return;
+    }
+
+    const installOperation = (async () => {
+      const wc = await webcontainer;
+
+      let packageManager = 'npm';
+
+      if (await pathExists('pnpm-lock.yaml')) {
+        packageManager = 'pnpm';
+      } else if (await pathExists('yarn.lock')) {
+        packageManager = 'yarn';
+      }
+
+      workbenchStore.toggleTerminal(true);
+      workbenchStore.writeToBoltTerminal(`\r\n$ ${packageManager} install\r\n`);
+
+      const installProcess = await wc.spawn(packageManager, ['install']);
+
+      installProcess.output
+        .pipeTo(
+          new WritableStream({
+            write(chunk) {
+              if (
+                workbenchStore.projectGeneration.get() === bridgeProjectGeneration &&
+                chatId.get() === bridgeChatId
+              ) {
+                workbenchStore.writeToBoltTerminal(chunk);
+              }
+            },
+          }),
+        )
+        .catch(() => {});
+
+      const exitCode = await installProcess.exit;
+
+      if (
+        workbenchStore.projectGeneration.get() === bridgeProjectGeneration &&
+        chatId.get() === bridgeChatId
+      ) {
+        workbenchStore.writeToBoltTerminal(
+          `\r\n[${packageManager} install exited with code ${exitCode}]\r\n`,
+        );
+      }
+
+      if (exitCode !== 0) {
+        throw new Error(`${packageManager} install failed with exit code ${exitCode}`);
+      }
+    })();
+
+    dependencyInstallOperations.set(installKey, installOperation);
+
+    try {
+      await installOperation;
+    } finally {
+      dependencyInstallOperations.delete(installKey);
+    }
+  }
 
   server.registerTool(
     'project_read_file',
@@ -656,6 +745,11 @@ export async function createProjectMcpBridge() {
           }
 
           const wc = await webcontainer;
+          assertNotAborted(extra.signal);
+          assertProjectCurrent();
+
+          // 運行命令前自動確保依賴已安裝，避免 vite 等命令找不到
+          await ensureDependenciesInstalled();
           assertNotAborted(extra.signal);
           assertProjectCurrent();
 

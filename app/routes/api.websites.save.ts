@@ -3,10 +3,17 @@ import { checkQuota, deductQuota } from '~/lib/server/quota';
 import { websiteOperations } from '~/lib/server/database';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import type { ActionFunctionArgs } from 'react-router';
 
+// 基於當前模塊位置定位項目根目錄
+// 當前文件位於 app/routes/，項目根目錄是往上兩層
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+
 // 網站保存目錄
-const WEBSITES_DIR = process.env.WEBSITES_DIR || path.join(process.cwd(), 'data', 'websites');
+const WEBSITES_DIR = process.env.WEBSITES_DIR || path.join(PROJECT_ROOT, 'data', 'websites');
 
 // 確保目錄存在
 if (!fs.existsSync(WEBSITES_DIR)) {

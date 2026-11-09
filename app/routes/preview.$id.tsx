@@ -1,10 +1,17 @@
-import { db } from '~/lib/server/database';
+import { websiteOperations } from '~/lib/server/database';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import type { LoaderFunctionArgs } from 'react-router';
 
+// 基於當前模塊位置定位項目根目錄
+// 當前文件位於 app/routes/，項目根目錄是往上兩層
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+
 // 網站保存目錄
-const WEBSITES_DIR = process.env.WEBSITES_DIR || path.join(process.cwd(), 'data', 'websites');
+const WEBSITES_DIR = process.env.WEBSITES_DIR || path.join(PROJECT_ROOT, 'data', 'websites');
 
 // 網站預覽路由
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -15,9 +22,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   // 查詢網站
-  const website = db.prepare('SELECT * FROM websites WHERE id = ? AND status != ?').get(websiteId, 'disabled') as any;
+  const website = websiteOperations.findById(Number(websiteId));
 
-  if (!website) {
+  if (!website || website.status === 'disabled') {
     return new Response('Website not found', { status: 404 });
   }
 

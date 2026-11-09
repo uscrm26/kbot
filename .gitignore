@@ -63,3 +63,10 @@ test-results.json
 test-results-summary.txt
 .vercel
 .env*
+
+# runtime data
+data/
+
+# keep lk888 platform docs
+!docs/lk888/
+!docs/lk888/*.md

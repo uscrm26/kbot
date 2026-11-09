@@ -20,6 +20,10 @@ export function withAgentToolCallRecovery(model: LanguageModel, onRetry: () => v
 
   return {
     ...normalized,
+    // 保留原始模型的頂層屬性
+    provider: typeof model === 'string' ? undefined : model.provider,
+    modelId: typeof model === 'string' ? undefined : model.modelId,
+    specificationVersion: typeof model === 'string' ? undefined : model.specificationVersion,
     doStream: async (params: Parameters<typeof normalized.doStream>[0]) => {
       const choice = params.toolChoice;
 
@@ -255,6 +259,10 @@ export function withAgentStreamDeadlines(model: LanguageModel, limits = DEFAULT_
 
   return {
     ...normalized,
+    // 保留原始模型的頂層屬性
+    provider: typeof model === 'string' ? undefined : model.provider,
+    modelId: typeof model === 'string' ? undefined : model.modelId,
+    specificationVersion: typeof model === 'string' ? undefined : model.specificationVersion,
     doStream: async (params: Parameters<typeof normalized.doStream>[0]) => {
       const attempt = new AbortController();
       const signal = params.abortSignal ? AbortSignal.any([params.abortSignal, attempt.signal]) : attempt.signal;

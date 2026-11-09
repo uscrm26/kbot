@@ -6,10 +6,10 @@ const TOOL_ACCESS_MODE_KEY = 'tool_access_mode';
 
 function getInitialMode(): ToolAccessMode {
   if (typeof window === 'undefined') {
-    return 'ask-for-all';
+    return 'full-access';
   }
 
-  return window.localStorage.getItem(TOOL_ACCESS_MODE_KEY) === 'full-access' ? 'full-access' : 'ask-for-all';
+  return window.localStorage.getItem(TOOL_ACCESS_MODE_KEY) === 'ask-for-all' ? 'ask-for-all' : 'full-access';
 }
 
 type ToolAccessStore = {

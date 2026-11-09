@@ -6,7 +6,7 @@ import type { AnyMessage } from '~/lib/persistence/messageMigration';
 const planSchema = z
   .object({
     goal: z.string().min(1).max(500),
-    steps: z.array(z.string().min(1).max(250)).min(1).max(6),
+    steps: z.array(z.string().min(1).max(250)).min(1).max(12),
     criteria: z
       .array(z.object({ id: z.string().min(1).max(40), description: z.string().min(1).max(400) }))
       .min(1)

@@ -182,5 +182,18 @@ export function getOpenAILikeModel(baseURL: string, apiKey: OptionalApiKey, mode
     apiKey,
   });
 
-  return openai.chat(model);
+  const chatModel = openai.chat(model);
+
+  // 用 Proxy 包裝，讓頂層可以訪問 provider 屬性
+  // 新版本 @ai-sdk/openai 把 provider 放在 config 裡，但是 ai SDK 期望它在頂層
+  return new Proxy(chatModel, {
+    get(target, prop, receiver) {
+      if (prop === 'provider') {
+        // 先從 config 取，如果沒有就用預設值
+        return (target as any).config?.provider || 'openai.chat';
+      }
+
+      return Reflect.get(target, prop, receiver);
+    },
+  });
 }

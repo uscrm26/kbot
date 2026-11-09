@@ -1,8 +1,16 @@
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
+import { fileURLToPath } from 'url';
 
-// 數據文件路徑
-const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+// 基於當前模塊位置定位項目根目錄
+// 當前文件：app/lib/server/database.ts，項目根目錄是往上四層
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+
+// 數據文件路徑，優先使用環境變量，其次使用項目根目錄
+const DATA_DIR = process.env.DATA_DIR || path.join(PROJECT_ROOT, 'data');
 const DB_PATH = path.join(DATA_DIR, 'kbot.json');
 
 // 確保數據目錄存在
@@ -110,7 +118,6 @@ export function initDatabase() {
   const existingAdmin = db.users.find(u => u.email === adminEmail);
   
   if (!existingAdmin) {
-    const crypto = require('crypto');
     const passwordHash = crypto
       .createHash('sha256')
       .update('kewq3211')

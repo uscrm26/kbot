@@ -154,7 +154,7 @@ export const ChatImpl = memo(
     const [animationScope, animate] = useAnimate();
     const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
     const [chatMode, setChatMode] = useState<'discuss' | 'build'>('build');
-    const [agentMode, setAgentMode] = useState(() => Cookies.get('agentMode') === 'true');
+    const [agentMode, setAgentMode] = useState(() => Cookies.get('agentMode') !== 'false');
     const [selectedElement, setSelectedElement] = useState<ElementInfo | null>(null);
     const mcpSettings = useMCPStore((state) => state.settings);
     const installedPlugins = usePluginStore((state) => state.plugins);
@@ -858,10 +858,21 @@ export const ChatImpl = memo(
         return;
       }
 
-      await Promise.all([
-        animate('#examples', { opacity: 0, display: 'none' }, { duration: 0.1 }),
-        animate('#intro', { opacity: 0, flex: 1 }, { duration: 0.2, ease: cubicEasingFn }),
-      ]);
+      const introAnimations: Promise<unknown>[] = [];
+
+      if (document.querySelector('#examples')) {
+        introAnimations.push(animate('#examples', { opacity: 0, display: 'none' }, { duration: 0.1 }));
+      }
+
+      if (document.querySelector('#intro')) {
+        introAnimations.push(animate('#intro', { opacity: 0, flex: 1 }, { duration: 0.2, ease: cubicEasingFn }));
+      }
+
+      try {
+        await Promise.all(introAnimations);
+      } catch {
+        // 首頁元素缺失時不阻斷視圖切換
+      }
 
       chatStore.setKey('started', true);
 
