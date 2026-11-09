@@ -323,7 +323,7 @@ export const Workbench = memo(
     const isSmallViewport = useViewport(1024);
     const streaming = useStore(streamingState);
     const [isSyncing, setIsSyncing] = useState(false);
-    const [loadedViews, setLoadedViews] = useState<Set<WorkbenchViewType>>(() => new Set(['code']));
+    const [loadedViews, setLoadedViews] = useState<Set<WorkbenchViewType>>(() => new Set(['preview']));
     const previousHasPreviewRef = useRef(hasPreview);
 
     const setSelectedView = (view: WorkbenchViewType) => {
@@ -422,10 +422,10 @@ export const Workbench = memo(
     return (
       chatStarted && (
         <motion.div
-          initial="closed"
+          initial={false}
           animate={showWorkbench ? 'open' : 'closed'}
           variants={workbenchVariants}
-          className="z-workbench"
+          className="z-workbench flex-shrink-0"
         >
           <div
             className={classNames(

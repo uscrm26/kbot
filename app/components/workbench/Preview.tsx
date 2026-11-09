@@ -9,6 +9,8 @@ import { IconButton } from '~/components/ui/IconButton';
 import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
 import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
 import { workbenchStore } from '~/lib/stores/workbench';
+import { streamingState } from '~/lib/stores/streaming';
+import { t } from '~/lib/i18n';
 
 type ResizeSide = 'left' | 'right' | null;
 
@@ -64,6 +66,8 @@ export const Preview = memo(({ selectedElement, setSelectedElement }: PreviewPro
   const [isFullscreen, setIsFullscreen] = useState(false);
   const hasSelectedPreview = useRef(false);
   const previews = useStore(workbenchStore.previews);
+  const isStreaming = useStore(streamingState);
+  const filesMap = useStore(workbenchStore.files);
   const activePreview = previews[activePreviewIndex];
   const [displayPath, setDisplayPath] = useState('/');
   const [iframeUrl, setIframeUrl] = useState<string | undefined>();
@@ -1189,8 +1193,15 @@ export const Preview = memo(({ selectedElement, setSelectedElement }: PreviewPro
               )}
             </>
           ) : (
-            <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-              沒有可用的預覽
+            <div className="flex w-full h-full flex-col gap-3 justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textSecondary">
+              <div className="i-ph:spinner-gap text-3xl animate-spin text-bolt-elements-textTertiary" />
+              <span className="text-sm">
+                {isStreaming
+                  ? t('preview.preparing')
+                  : Object.keys(filesMap).length > 0
+                    ? t('preview.starting')
+                    : t('preview.none')}
+              </span>
             </div>
           )}
 
