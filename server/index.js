@@ -70,6 +70,7 @@ async function start() {
   });
 
   const server = http.createServer((req, res) => {
+    res.setHeader('X-Kbot-Server', 'custom-node-0d12f6a');
     // 兜底：部分代理層不會觸發 upgrade 事件，在 request 層直接處理 WebSocket 握手
     if (asrInfo.isASRPath(req.url)) {
       console.error('[asr-headers]', JSON.stringify(req.headers));
