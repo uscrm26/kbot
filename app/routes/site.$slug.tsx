@@ -1,18 +1,11 @@
 import { websiteOperations } from '~/lib/server/database';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import type { LoaderFunctionArgs } from 'react-router';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const PROJECT_ROOT = path.resolve(__dirname, '..');
-const WEBSITES_DIR = process.env.WEBSITES_DIR || path.join(PROJECT_ROOT, 'data', 'websites');
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
@@ -24,9 +17,20 @@ const MIME_TYPES: Record<string, string> = {
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
+  '.txt': 'text/plain; charset=utf-8',
 };
 
-// 公開網站托管路由
+function getExtension(filePath: string): string {
+  const clean = filePath.split('?')[0].split('#')[0];
+  const dot = clean.lastIndexOf('.');
+  return dot >= 0 ? clean.slice(dot).toLowerCase() : '';
+}
+
+function normalizeKey(filePath: string): string {
+  return filePath.replace(/^\/+/, '').replace(/\/+$/, '');
+}
+
+// 公開網站托管路由，直接從網站記錄中的檔案提供內容
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const slug = params.slug;
 
@@ -41,28 +45,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  let filePath = url.pathname.replace(`/site/${slug}`, '');
+  let requestedPath = decodeURIComponent(url.pathname.replace(`/site/${slug}`, ''));
 
-  if (filePath === '/' || filePath === '') {
-    filePath = '/index.html';
+  if (requestedPath === '' || requestedPath === '/') {
+    requestedPath = '/index.html';
   }
 
-  const baseDir = path.join(WEBSITES_DIR, website.id.toString());
-  let fullPath = path.join(baseDir, filePath);
+  const files = website.files || {};
+  let key = normalizeKey(requestedPath);
+  let content = files[key];
 
-  if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isFile()) {
-    const indexPath = path.join(fullPath, 'index.html');
+  // 支援無結尾斜線或省略 index.html 的路徑
+  if (content === undefined) {
+    const fallbackKey = normalizeKey(`${requestedPath}/index.html`);
+    content = files[fallbackKey];
 
-    if (fs.existsSync(indexPath)) {
-      fullPath = indexPath;
-    } else {
-      return new Response('File not found', { status: 404 });
+    if (content !== undefined) {
+      key = fallbackKey;
     }
   }
 
-  const content = fs.readFileSync(fullPath);
-  const ext = path.extname(fullPath).toLowerCase();
-  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+  if (content === undefined) {
+    return new Response('File not found', { status: 404 });
+  }
+
+  const contentType = MIME_TYPES[getExtension(key)] || 'application/octet-stream';
 
   return new Response(content, {
     headers: {

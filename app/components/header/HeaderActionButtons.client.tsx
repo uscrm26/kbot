@@ -2,6 +2,7 @@ import { useStore } from '@nanostores/react';
 import { useState } from 'react';
 import { DeployButton } from '~/components/deploy/DeployButton';
 import { ReportBugPanel } from '~/components/header/ReportBugPanel';
+import { SaveWebsiteButton } from '~/components/header/SaveWebsiteButton';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { t, setLanguage, getLanguage, getAvailableLanguages } from '~/lib/i18n';
 
@@ -51,6 +52,9 @@ export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionB
           </div>
         )}
       </div>
+
+      {/* Save to account */}
+      {shouldShowButtons && <SaveWebsiteButton />}
 
       {/* Deploy Button */}
       {shouldShowButtons && <DeployButton />}

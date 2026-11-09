@@ -31,6 +31,7 @@ import { extractPropertiesFromMessage } from '~/lib/.server/llm/utils';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 import { getCurrentUser } from '~/lib/server/auth';
 import { checkKCompute, deductKCompute } from '~/lib/server/kcompute';
+import { historyOperations } from '~/lib/server/database';
 import { getAgentLoopInstructions, getAgentLoopProgress } from '~/lib/common/agentLoop';
 import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
 import { getStarterBuildProgress } from '~/lib/common/starterBuild';
@@ -81,21 +82,29 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
   const messages = asMessages(body.messages);
 
-  // 臨時注釋掉 K算力檢查，測試是不是這個問題導致的
-  // const user = getCurrentUser(request);
-  // if (user && user.role !== 'admin') {
-  //   // 判斷是生成還是修改
-  //   const isGenerate = messages.length <= 1; // 第一條消息是生成，後續是修改
-  //   const computeType = isGenerate ? 'generate' : 'modify';
-  //
-  //   const computeCheck = checkKCompute(user.id, computeType);
-  //   if (!computeCheck.allowed) {
-  //     return Response.json({
-  //       error: computeCheck.reason,
-  //       required_k_compute: computeCheck.required,
-  //     }, { status: 403 });
-  //   }
-  // }
+  // 判斷本次操作屬於全新生成還是在已有專案上修改
+  const hasArtifact = messages.some(
+    (message) => message.role === 'assistant' && getMessageText(message).includes('<boltArtifact'),
+  );
+  const computeType: 'generate' | 'modify' = hasArtifact ? 'modify' : 'generate';
+
+  // K 算力檢查，僅對已登入的非管理員用戶生效，訪客暫時放行
+  const currentUser = getCurrentUser(request);
+
+  if (currentUser && currentUser.role !== 'admin') {
+    const computeCheck = checkKCompute(currentUser.id, computeType);
+
+    if (!computeCheck.allowed) {
+      return Response.json(
+        {
+          error: computeCheck.reason,
+          required_k_compute: computeCheck.required,
+          code: 'K_COMPUTE_INSUFFICIENT',
+        },
+        { status: 403 },
+      );
+    }
+  }
 
   const starterBuild = chatMode === 'build' ? getStarterBuildProgress(messages) : getStarterBuildProgress([]);
   const agentLoopEnabled = chatMode === 'build' && (agentMode || starterBuild.status !== 'inactive');
@@ -490,6 +499,21 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                   message: 'Response Generated',
                 } satisfies ProgressAnnotation,
               });
+
+              // 成功完成後扣減 K 算力並記錄生成歷史
+              if (currentUser && currentUser.role !== 'admin') {
+                deductKCompute(currentUser.id, computeType);
+
+                const lastUserMessage = [...messages].reverse().find((message) => message.role === 'user');
+
+                historyOperations.createHistory({
+                  user_id: currentUser.id,
+                  prompt: lastUserMessage ? getMessageText(lastUserMessage) : '',
+                  type: computeType,
+                  tokens_used: cumulativeUsage.totalTokens,
+                });
+              }
+
               await new Promise((resolve) => setTimeout(resolve, 0));
 
               return;
