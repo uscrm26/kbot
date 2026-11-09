@@ -70,6 +70,12 @@ async function start() {
   });
 
   const server = http.createServer((req, res) => {
+    // 兜底：部分代理層不會觸發 upgrade 事件，在 request 層直接處理 WebSocket 握手
+    if (req.headers.upgrade && asrInfo.isASRPath(req.url)) {
+      asrInfo.handleUpgrade(req, req.socket, Buffer.alloc(0));
+      return;
+    }
+
     serveStatic(req, res, () => {
       requestHandler(req, res);
     });

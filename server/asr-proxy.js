@@ -151,14 +151,23 @@ function attachUpstream(client) {
 export function attachASRProxy(server) {
   const wss = new WebSocketServer({ noServer: true });
 
-  server.on('upgrade', (req, socket, head) => {
-    const pathname = new URL(req.url, 'http://localhost').pathname;
-    if (pathname !== '/asr-async' && pathname !== '/asr-nostream') {
-      return;
+  function isASRPath(reqUrl) {
+    const pathname = new URL(reqUrl, 'http://localhost').pathname;
+    return pathname === '/asr-async' || pathname === '/asr-nostream';
+  }
+
+  function handleUpgrade(req, socket, head) {
+    if (!isASRPath(req.url)) {
+      return false;
     }
     wss.handleUpgrade(req, socket, head, (client) => {
-      wss.emit('connection', client, req, pathname);
+      wss.emit('connection', client, req);
     });
+    return true;
+  }
+
+  server.on('upgrade', (req, socket, head) => {
+    handleUpgrade(req, socket, head);
   });
 
   wss.on('connection', (client, req) => {
@@ -172,5 +181,7 @@ export function attachASRProxy(server) {
 
   return {
     mode: hasCredentials() ? 'upstream' : 'mock',
+    handleUpgrade,
+    isASRPath,
   };
 }
