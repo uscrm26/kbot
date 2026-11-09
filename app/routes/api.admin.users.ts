@@ -1,5 +1,6 @@
 import { getCurrentUser } from '~/lib/server/auth';
 import { userOperations } from '~/lib/server/database';
+import { kComputeToCNY } from '~/lib/server/kcompute';
 import type { LoaderFunctionArgs, ActionFunctionArgs } from 'react-router';
 
 // 檢查是否是管理員
@@ -18,10 +19,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // 獲取用戶列表
-  const users = userOperations.getAllUsers().map(u => {
-    const { password_hash, ...userWithoutPassword } = u;
-    return userWithoutPassword;
+  // 獲取用戶列表，並附加算力與人民幣金額換算
+  const users = userOperations.getAllUsers().map((u) => {
+    const { password_hash, ...rest } = u;
+
+    return {
+      ...rest,
+      used_cny: kComputeToCNY(u.k_compute_used),
+      balance_cny: kComputeToCNY(u.k_compute_balance),
+    };
   });
 
   return Response.json({ users });
@@ -38,7 +44,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return Response.json({ error: 'Method not allowed' }, { status: 405 });
   }
 
-  const body = await request.json();
+  const body: any = await request.json();
   const { userId, k_compute_balance, is_active, tier } = body;
 
   if (!userId) {

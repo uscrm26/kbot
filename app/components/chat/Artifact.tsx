@@ -92,16 +92,16 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
 
   // Render terminal states for empty, failed, and cancelled setup artifacts.
   const setupTitles = {
-    failed: restored ? 'Project Restore Failed' : 'Project Setup Failed',
-    aborted: restored ? 'Project Restore Incomplete' : 'Project Setup Incomplete',
-    complete: restored ? 'Project Restored' : 'Project Created',
-    running: restored ? 'Restoring Project...' : 'Creating Project...',
+    failed: restored ? t('artifact.restore.failed') : t('artifact.setup.failed'),
+    aborted: restored ? t('artifact.restore.aborted') : t('artifact.setup.aborted'),
+    complete: restored ? t('artifact.restore.complete') : t('artifact.setup.complete'),
+    running: restored ? t('artifact.restore.running') : t('artifact.setup.running'),
   };
 
   const dynamicTitle = artifact.type === 'bundled' ? setupTitles[setupStatus] : artifact.title;
 
   const setupDescription = failed
-    ? 'One or more setup actions failed.'
+    ? t('artifact.setup.failed.desc')
     : interrupted
       ? t('artifact.project.interrupted')
       : emptySetup

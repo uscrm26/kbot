@@ -19,146 +19,144 @@ export function TopNav() {
   const setAuth = useAuthStore((state) => state.setAuth);
 
   return (
-    <div className="flex items-center gap-2 w-full bg-white/90 backdrop-blur-xl px-6 py-3 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border-b border-gray-100">
-      <div className="flex items-center gap-1">
-        {nav.groups.map((group) => (
-          <GroupMenu
-            key={group.id}
-            group={group}
-            open={openGroup === group.id}
-            onOpenChange={(open) => setOpenGroup(open ? group.id : null)}
-          />
-        ))}
-        {nav.links.map((link) => (
-          <button
-            key={link.id}
-            type="button"
-            onClick={() => {
-              if (link.id === 'pricing') {
-                window.location.href = '/pricing';
-              }
-            }}
-            className="px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-white transition-colors whitespace-nowrap"
-          >
-            {link.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-1.5 ml-auto">
-        <ThemeSwitch />
-
-        <div className="relative" onMouseLeave={() => setLangOpen(false)}>
-          <button
-            type="button"
-            onClick={() => setLangOpen((v) => !v)}
-            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
-          >
-            <div className="i-ph:globe text-base" />
-            <span>{languages.find((l) => l.code === currentLang)?.flag || '🇭🇰'}</span>
-            <span className="hidden sm:inline">{languages.find((l) => l.code === currentLang)?.name}</span>
-          </button>
-          {langOpen && (
-            <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg z-50 p-1">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => {
-                    setLanguage(lang.code);
-                    setLangOpen(false);
-                  }}
-                  className={classNames(
-                    'flex items-center gap-2 w-full text-left px-2 py-1 text-xs rounded-md hover:bg-bolt-elements-item-backgroundActive',
-                    lang.code === currentLang
-                      ? 'text-accent-600 font-medium'
-                      : 'text-bolt-elements-textPrimary',
-                  )}
-                >
-                  <span className="text-sm">{lang.flag}</span>
-                  <span>{lang.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
+    <>
+      <div className="flex items-center justify-between w-full gap-6">
+        <div className="flex items-center gap-0.5 min-w-0">
+          {nav.groups.map((group) => (
+            <GroupMenu
+              key={group.id}
+              group={group}
+              open={openGroup === group.id}
+              onOpenChange={(open) => setOpenGroup(open ? group.id : null)}
+            />
+          ))}
+          {nav.links.map((link) => (
+            <button
+              key={link.id}
+              type="button"
+              onClick={() => {
+                if (link.id === 'pricing') {
+                  window.location.href = '/pricing';
+                }
+              }}
+              className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap"
+            >
+              {link.label}
+            </button>
+          ))}
         </div>
 
-        {user ? (
-          <div className="relative" onMouseLeave={() => setUserMenuOpen(false)}>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <ThemeSwitch />
+
+          <div className="relative" onMouseLeave={() => setLangOpen(false)}>
             <button
               type="button"
-              onClick={() => setUserMenuOpen((v) => !v)}
-              className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+              onClick={() => setLangOpen((v) => !v)}
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
-              <div className="i-ph:user-circle text-lg" />
-              <span>{user.name}</span>
-              <div className="i-ph:caret-down text-xs" />
+              <div className="i-ph:globe text-base" />
+              <span>{languages.find((l) => l.code === currentLang)?.flag || '🇭🇰'}</span>
+              <span className="hidden lg:inline">{languages.find((l) => l.code === currentLang)?.name}</span>
             </button>
-            {userMenuOpen && (
-              <div className="absolute right-0 top-full mt-1 min-w-[210px] rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg z-50 p-1.5">
-                <div className="px-3 py-2 border-b border-bolt-elements-borderColor mb-1">
-                  <div className="text-xs text-bolt-elements-textSecondary">{nav.compute}</div>
-                  <div className="text-sm font-semibold text-accent-600">
-                    {Math.round(user.k_compute_balance)}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUserMenuOpen(false);
-                    window.location.href = '/dashboard';
-                  }}
-                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive"
-                >
-                  <div className="i-ph:globe text-base" />
-                  {nav.mySites}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUserMenuOpen(false);
-                    window.location.href = '/pricing';
-                  }}
-                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive"
-                >
-                  <div className="i-ph:currency-circle-dollar text-base" />
-                  {nav.upgrade}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUserMenuOpen(false);
-                    logout();
-                  }}
-                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-md text-red-500 hover:bg-red-50"
-                >
-                  <div className="i-ph:sign-out text-base" />
-                  {nav.logout}
-                </button>
+            {langOpen && (
+              <div className="absolute right-0 top-full mt-1.5 min-w-[150px] rounded-xl border border-slate-200 bg-white shadow-lg z-50 p-1">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setLangOpen(false);
+                    }}
+                    className={classNames(
+                      'flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg',
+                      lang.code === currentLang
+                        ? 'text-blue-600 bg-blue-50 font-medium'
+                        : 'text-slate-700 hover:bg-slate-100',
+                    )}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.name}</span>
+                  </button>
+                ))}
               </div>
             )}
           </div>
-        ) : (
+
+          <div className="w-px h-6 bg-slate-200 mx-1" />
+
+          {user ? (
+            <div className="relative" onMouseLeave={() => setUserMenuOpen(false)}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((v) => !v)}
+                className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                  {user.name.slice(0, 1)}
+                </div>
+                <span className="hidden sm:inline max-w-[120px] truncate">{user.name}</span>
+                <div className="i-ph:caret-down text-xs text-slate-400" />
+              </button>
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 min-w-[220px] rounded-xl border border-slate-200 bg-white shadow-lg z-50 p-1.5">
+                  <div className="px-3 py-2.5 rounded-lg bg-slate-50 mb-1">
+                    <div className="text-xs text-slate-500">{nav.compute}</div>
+                    <div className="text-xl font-bold text-blue-600 leading-tight">
+                      {Math.round(user.k_compute_balance)}
+                    </div>
+                  </div>
+                  <MenuButton
+                    icon="i-ph:globe"
+                    label={nav.mySites}
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      window.location.href = '/dashboard';
+                    }}
+                  />
+                  <MenuButton
+                    icon="i-ph:currency-cny"
+                    label={nav.upgrade}
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      window.location.href = '/pricing';
+                    }}
+                  />
+                  <MenuButton
+                    icon="i-ph:sign-out"
+                    label={nav.logout}
+                    danger
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      logout();
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAuthOpen(true)}
+              className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            >
+              {nav.login}
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={() => setAuthOpen(true)}
-            className="px-3 py-1.5 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+            onClick={() => {
+              window.location.href = '/';
+            }}
+            className="ml-1 px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
           >
-            {nav.login}
+            {nav.start}
           </button>
-        )}
-        <button
-          type="button"
-          onClick={() => {
-            window.location.href = '/';
-          }}
-          className="px-4 py-1.5 text-sm rounded-lg bg-accent-600 text-white hover:bg-accent-700 transition-colors font-medium"
-        >
-          {nav.start}
-        </button>
+        </div>
       </div>
 
-      {/* 登入模態框 */}
       {authOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -170,7 +168,7 @@ export function TopNav() {
           >
             <button
               onClick={() => setAuthOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
             >
               <div className="i-ph:x text-xl" />
             </button>
@@ -183,7 +181,33 @@ export function TopNav() {
           </div>
         </div>
       )}
-    </div>
+    </>
+  );
+}
+
+function MenuButton({
+  icon,
+  label,
+  onClick,
+  danger,
+}: {
+  icon: string;
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={classNames(
+        'flex items-center gap-2.5 w-full text-left px-3 py-2 text-sm rounded-lg transition-colors',
+        danger ? 'text-rose-500 hover:bg-rose-50' : 'text-slate-700 hover:bg-slate-100',
+      )}
+    >
+      <div className={classNames(icon, 'text-base')} />
+      {label}
+    </button>
   );
 }
 
@@ -202,22 +226,20 @@ function GroupMenu({
         type="button"
         onClick={() => onOpenChange(!open)}
         className={classNames(
-          'flex items-center gap-1 px-3 py-2 text-sm rounded-md transition-colors whitespace-nowrap',
-          open
-            ? 'text-bolt-elements-textPrimary bg-white'
-            : 'text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-white',
+          'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap',
+          open ? 'text-slate-900 bg-slate-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
         )}
       >
         {group.label}
         <div className={classNames('i-ph:caret-down text-xs transition-transform', open && 'rotate-180')} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 min-w-[220px] rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg z-50 p-1.5">
+        <div className="absolute left-0 top-full mt-1.5 min-w-[230px] rounded-xl border border-slate-200 bg-white shadow-lg z-50 p-1.5">
           {group.children.map((child) => (
             <button
               key={child.id}
               type="button"
-              className="flex w-full text-left px-3 py-2 text-sm rounded-md text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+              className="flex w-full text-left px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
             >
               {child.label}
             </button>

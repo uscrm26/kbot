@@ -12,6 +12,7 @@ import {
 } from '~/lib/persistence/messageMigration';
 import { useToolAccessStore } from '~/lib/stores/toolAccess';
 import { TOOL_EXECUTION_APPROVAL } from '~/utils/constants';
+import { t } from '~/lib/i18n';
 
 type ApprovalMessage = AnyMessage & { id?: string };
 type ToolOutputHandler = (options: { tool: string; toolCallId: string; output: unknown }) => void;
@@ -65,7 +66,7 @@ export function ToolApprovalTray({
           className="overflow-hidden rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg"
           aria-label="Tool approval requests"
         >
-          <div className="px-3 py-2 text-sm text-bolt-elements-textSecondary">Accept these tool requests?</div>
+          <div className="px-3 py-2 text-sm text-bolt-elements-textSecondary">{t('tool.accept.requests')}</div>
           <ul className="divide-y divide-bolt-elements-borderColor">
             {pending.map((tool) => {
               const responding = respondingIds.has(tool.id);
@@ -86,7 +87,7 @@ export function ToolApprovalTray({
                       onClick={() => respond(tool, false)}
                       className="rounded-md border border-bolt-elements-borderColor px-3 py-1.5 text-xs text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary disabled:opacity-50"
                     >
-                      Reject
+                      {t('tool.reject')}
                     </button>
                     <button
                       type="button"
@@ -94,7 +95,7 @@ export function ToolApprovalTray({
                       onClick={() => respond(tool, true)}
                       className="rounded-md bg-accent-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-accent-600 disabled:opacity-50"
                     >
-                      {responding ? 'Sending…' : 'Accept'}
+                      {responding ? t('tool.sending') : t('tool.accept')}
                     </button>
                   </div>
                 </li>

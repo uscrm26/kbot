@@ -3,6 +3,22 @@ import React, { useState } from 'react';
 import type { ProgressAnnotation } from '~/types/context';
 import { classNames } from '~/utils/classNames';
 import { cubicEasingFn } from '~/utils/easings';
+import { t } from '~/lib/i18n';
+
+// 服務端進度消息與多語言鍵的映射
+const MESSAGE_KEYS: Record<string, string> = {
+  'Generating Response': 'progress.generating',
+  'Response Generated': 'progress.response.generated',
+  'Analysing Request': 'progress.analysing',
+  'Analysis Complete': 'progress.analysis.complete',
+  'Determining Files to Read': 'progress.determining.files',
+  'Code Files Selected': 'progress.files.selected',
+};
+
+function translateMessage(message: string): string {
+  const key = MESSAGE_KEYS[message];
+  return key ? t(key) : message;
+}
 
 export default function ProgressCompilation({ data }: { data?: ProgressAnnotation[] }) {
   const [progressList, setProgressList] = React.useState<ProgressAnnotation[]>([]);
@@ -104,7 +120,7 @@ const ProgressItem = ({ progress }: { progress: ProgressAnnotation }) => {
         </div>
         {/* {x.label} */}
       </div>
-      {progress.message}
+      {translateMessage(progress.message)}
     </motion.div>
   );
 };

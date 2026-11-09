@@ -6,6 +6,19 @@ export const K_COMPUTE_PRICES = {
   modify: 0.3, // 修改一次網站消耗 0.3 K算力
 };
 
+// 算力與人民幣兌換比例，1 K算力 = 1 元人民幣
+export const CNY_PER_K_COMPUTE = 1;
+
+// 將 K 算力換算為人民幣金額
+export function kComputeToCNY(kCompute: number): number {
+  return Math.round(kCompute * CNY_PER_K_COMPUTE * 100) / 100;
+}
+
+// 格式化人民幣金額
+export function formatCNY(kCompute: number): string {
+  return `¥${kComputeToCNY(kCompute).toFixed(2)}`;
+}
+
 // 用戶級別默認算力
 export const TIER_DEFAULTS = {
   free: { monthly_k_compute: 10, name: '免費版' },
@@ -63,13 +76,15 @@ export function deductKCompute(
 export function getUserKCompute(userId: number): any {
   const user = userOperations.findById(userId);
   if (!user) return null;
-  
+
   const tierInfo = TIER_DEFAULTS[user.tier] || TIER_DEFAULTS.free;
-  
+
   return {
     tier: user.tier,
     k_compute_balance: user.k_compute_balance,
     k_compute_used: user.k_compute_used,
+    balance_cny: kComputeToCNY(user.k_compute_balance),
+    used_cny: kComputeToCNY(user.k_compute_used),
     tier_name: tierInfo.name,
     monthly_limit: tierInfo.monthly_k_compute,
   };

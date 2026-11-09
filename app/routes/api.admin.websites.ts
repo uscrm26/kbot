@@ -46,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return Response.json({ error: 'Method not allowed' }, { status: 405 });
   }
 
-  const body = await request.json();
+  const body: any = await request.json();
   const { websiteId, status } = body;
 
   if (!websiteId || !status) {
