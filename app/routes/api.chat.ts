@@ -40,6 +40,8 @@ import { getPluginToolDescriptions, getPluginTools } from '~/lib/plugins/adapter
 import { getProjectToolNames, projectToolDefinitions } from '~/lib/runtime/projectMcp.shared';
 import { withSecurity } from '~/lib/security';
 import { MCPService } from '~/lib/services/mcpService';
+import fs from 'node:fs';
+import path from 'node:path';
 import type { ContextAnnotation, ProgressAnnotation, ToolCallAnnotation } from '~/types/context';
 import type { IProviderSetting } from '~/types/model';
 import { WORK_DIR } from '~/utils/constants';
@@ -504,6 +506,22 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
               logger.info(
                 `KCOST_FINAL computeType=${computeType} promptTokens=${cumulativeUsage.promptTokens} completionTokens=${cumulativeUsage.completionTokens} totalTokens=${cumulativeUsage.totalTokens}`,
               );
+
+              try {
+                const costDir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+                const tracePath = path.join(costDir, 'cost-trace.jsonl');
+                const rec = JSON.stringify({
+                  ts: new Date().toISOString(),
+                  user_id: currentUser?.id ?? null,
+                  computeType,
+                  promptTokens: cumulativeUsage.promptTokens,
+                  completionTokens: cumulativeUsage.completionTokens,
+                  totalTokens: cumulativeUsage.totalTokens,
+                });
+                fs.appendFileSync(tracePath, rec + '\n');
+              } catch (traceErr) {
+                logger.warn('cost trace write failed');
+              }
 
               if (currentUser && currentUser.role !== 'admin') {
                 deductKCompute(currentUser.id, computeType);
