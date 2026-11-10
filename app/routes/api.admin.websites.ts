@@ -1,5 +1,5 @@
 import { getCurrentUser } from '~/lib/server/auth';
-import { websiteOperations, db } from '~/lib/server/database';
+import { websiteOperations, db, auditOperations } from '~/lib/server/database';
 import type { LoaderFunctionArgs, ActionFunctionArgs } from 'react-router';
 
 function requireAdmin(request: Request): any | null {
@@ -27,6 +27,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     slug: w.slug,
     custom_domain: w.custom_domain,
     status: w.status,
+    storage_bytes: w.storage_bytes,
     created_at: w.created_at,
     updated_at: w.updated_at,
   }));
@@ -47,7 +48,24 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const body: any = await request.json();
-  const { websiteId, status } = body;
+  const { websiteId, status, action: op } = body;
+
+  if (op === 'delete') {
+    if (!websiteId) {
+      return Response.json({ error: 'Website ID required' }, { status: 400 });
+    }
+    const website = websiteOperations.findById(websiteId);
+    if (!website) {
+      return Response.json({ error: 'Website not found' }, { status: 404 });
+    }
+    websiteOperations.deleteWebsite(websiteId);
+    auditOperations.log({
+      actor_id: admin.id, user_id: website.user_id, action: 'delete_website',
+      category: 'website', detail: `Deleted ${website.name}`,
+      ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
+    });
+    return Response.json({ success: true });
+  }
 
   if (!websiteId || !status) {
     return Response.json({ error: 'Website ID and status are required' }, { status: 400 });
@@ -60,6 +78,12 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   websiteOperations.updateWebsite(websiteId, { status });
+
+  auditOperations.log({
+    actor_id: admin.id, user_id: website.user_id, action: 'update_website_status',
+    category: 'website', detail: `Status set to ${status}`,
+    ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
+  });
 
   return Response.json({ success: true });
 }

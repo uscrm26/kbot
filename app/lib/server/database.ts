@@ -24,11 +24,13 @@ interface User {
   email: string;
   password_hash: string;
   name: string;
+  username?: string;
   avatar_url?: string;
   role: 'admin' | 'user';
   tier: 'free' | 'starter' | 'pro' | 'enterprise';
   k_compute_balance: number;
   k_compute_used: number;
+  storage_quota_bytes: number;
   is_active: boolean;
   google_id?: string;
   apple_id?: string;
@@ -49,9 +51,21 @@ interface Website {
   domain_verified?: boolean;
   preview_url?: string;
   status: 'draft' | 'published' | 'disabled';
+  storage_bytes: number;
   files?: any;
   created_at: string;
   updated_at: string;
+}
+
+interface AuditLog {
+  id: number;
+  user_id?: number;
+  actor_id?: number;
+  action: string;
+  category: 'auth' | 'admin' | 'website' | 'system' | 'billing';
+  detail?: string;
+  ip?: string;
+  created_at: string;
 }
 
 interface GenerationHistory {
@@ -76,9 +90,12 @@ interface Database {
   websites: Website[];
   generation_history: GenerationHistory[];
   sessions: Session[];
+  audit_logs: AuditLog[];
+  system_settings: Record<string, any>;
   nextUserId: number;
   nextWebsiteId: number;
   nextHistoryId: number;
+  nextAuditLogId: number;
 }
 
 // 加載數據庫
@@ -92,9 +109,12 @@ function loadDatabase(): Database {
       websites: data.websites || [],
       generation_history: data.generation_history || [],
       sessions: data.sessions || [],
+      audit_logs: data.audit_logs || [],
+      system_settings: data.system_settings || {},
       nextUserId: data.nextUserId || 1,
       nextWebsiteId: data.nextWebsiteId || 1,
       nextHistoryId: data.nextHistoryId || 1,
+      nextAuditLogId: data.nextAuditLogId || 1,
     };
   }
   return {
@@ -102,9 +122,17 @@ function loadDatabase(): Database {
     websites: [],
     generation_history: [],
     sessions: [],
+    audit_logs: [],
+    system_settings: {
+      guest_access: false,
+      free_storage_bytes: 10 * 1024 * 1024,
+      free_compute: 10,
+      maintenance_mode: false,
+    },
     nextUserId: 1,
     nextWebsiteId: 1,
     nextHistoryId: 1,
+    nextAuditLogId: 1,
   };
 }
 
@@ -136,6 +164,7 @@ export function initDatabase() {
       tier: 'enterprise',
       k_compute_balance: 999999,
       k_compute_used: 0,
+      storage_quota_bytes: 1024 * 1024 * 1024,
       is_active: true,
       created_at: new Date().toISOString(),
     };
@@ -156,13 +185,15 @@ export const userOperations = {
     return db.users.find(u => u.id === id);
   },
 
-  createUser(user: Omit<User, 'id' | 'created_at' | 'k_compute_balance' | 'k_compute_used' | 'is_active' | 'role' | 'tier'>): User {
+  createUser(user: Omit<User, 'id' | 'created_at' | 'k_compute_balance' | 'k_compute_used' | 'is_active' | 'role' | 'tier' | 'storage_quota_bytes'>): User {
+    const freeStorage = db.system_settings?.free_storage_bytes || 10 * 1024 * 1024;
     const newUser: User = {
       id: db.nextUserId++,
       role: 'user',
       tier: 'free',
       k_compute_balance: 10,
       k_compute_used: 0,
+      storage_quota_bytes: freeStorage,
       is_active: true,
       created_at: new Date().toISOString(),
       ...user,
@@ -183,6 +214,14 @@ export const userOperations = {
   getAllUsers(): User[] {
     return db.users;
   },
+
+  deleteUser(id: number): boolean {
+    const before = db.users.length;
+    db.users = db.users.filter(u => u.id !== id);
+    db.websites = db.websites.filter(w => w.user_id !== id);
+    saveDatabase(db);
+    return db.users.length < before;
+  },
 };
 
 // 網站操作
@@ -199,10 +238,11 @@ export const websiteOperations = {
     return db.websites.find(w => w.slug === slug);
   },
 
-  createWebsite(website: Omit<Website, 'id' | 'created_at' | 'updated_at' | 'status'>): Website {
+  createWebsite(website: Omit<Website, 'id' | 'created_at' | 'updated_at' | 'status' | 'storage_bytes'>): Website {
     const newWebsite: Website = {
       id: db.nextWebsiteId++,
       status: 'draft',
+      storage_bytes: 0,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       ...website,
@@ -218,6 +258,17 @@ export const websiteOperations = {
     db.websites[index] = { ...db.websites[index], ...updates, updated_at: new Date().toISOString() };
     saveDatabase(db);
     return db.websites[index];
+  },
+
+  deleteWebsite(id: number): boolean {
+    const before = db.websites.length;
+    db.websites = db.websites.filter(w => w.id !== id);
+    saveDatabase(db);
+    return db.websites.length < before;
+  },
+
+  getAllWebsites(): Website[] {
+    return db.websites;
   },
 };
 
@@ -266,6 +317,49 @@ export const sessionOperations = {
     const now = new Date().toISOString();
     db.sessions = db.sessions.filter(s => s.expires_at > now);
     saveDatabase(db);
+  },
+};
+
+// 審計記錄操作
+export const auditOperations = {
+  log(entry: Omit<AuditLog, 'id' | 'created_at'>): AuditLog {
+    const newLog: AuditLog = {
+      id: db.nextAuditLogId++,
+      created_at: new Date().toISOString(),
+      ...entry,
+    };
+    db.audit_logs.push(newLog);
+    saveDatabase(db);
+    return newLog;
+  },
+
+  findByUserId(userId: number): AuditLog[] {
+    return db.audit_logs.filter(l => l.user_id === userId || l.actor_id === userId);
+  },
+
+  getAll(limit = 200): AuditLog[] {
+    return db.audit_logs.slice(-limit).reverse();
+  },
+
+  findByCategory(category: string, limit = 200): AuditLog[] {
+    return db.audit_logs.filter(l => l.category === category).slice(-limit).reverse();
+  },
+};
+
+// 系統設置操作
+export const systemSettingsOperations = {
+  getAll(): Record<string, any> {
+    return db.system_settings;
+  },
+
+  get(key: string): any {
+    return db.system_settings[key];
+  },
+
+  update(updates: Record<string, any>): Record<string, any> {
+    db.system_settings = { ...db.system_settings, ...updates };
+    saveDatabase(db);
+    return db.system_settings;
   },
 };
 
