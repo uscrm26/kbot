@@ -20,6 +20,16 @@ export function TopNav() {
 
   return (
     <>
+      <style>{`
+        @keyframes kbot-dropdown-in {
+          from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .kbot-dropdown {
+          animation: kbot-dropdown-in 0.16s ease-out;
+          transform-origin: top center;
+        }
+      `}</style>
       <div className="flex items-center justify-between w-full gap-6">
         <div className="flex items-center gap-0.5 min-w-0">
           {nav.groups.map((group) => (
@@ -66,26 +76,28 @@ export function TopNav() {
               <span className="hidden lg:inline">{languages.find((l) => l.code === currentLang)?.name}</span>
             </button>
             {langOpen && (
-              <div className="absolute right-0 top-full mt-1.5 min-w-[150px] rounded-xl border border-slate-200 bg-white shadow-lg z-50 p-1">
-                {languages.map((lang) => (
-                  <button
-                    key={lang.code}
-                    type="button"
-                    onClick={() => {
-                      setLanguage(lang.code);
-                      setLangOpen(false);
-                    }}
-                    className={classNames(
-                      'flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg',
-                      lang.code === currentLang
-                        ? 'text-blue-600 bg-blue-50 font-medium'
-                        : 'text-slate-700 hover:bg-slate-100',
-                    )}
-                  >
-                    <span>{lang.flag}</span>
-                    <span>{lang.name}</span>
-                  </button>
-                ))}
+              <div className="absolute right-0 top-full pt-2 z-50">
+                <div className="kbot-dropdown min-w-[150px] rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 p-1">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => {
+                        setLanguage(lang.code);
+                        setLangOpen(false);
+                      }}
+                      className={classNames(
+                        'flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg',
+                        lang.code === currentLang
+                          ? 'text-blue-600 bg-blue-50 font-medium'
+                          : 'text-slate-700 hover:bg-slate-100',
+                      )}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -106,13 +118,14 @@ export function TopNav() {
                 <div className="i-ph:caret-down text-xs text-slate-400" />
               </button>
               {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-1.5 min-w-[220px] rounded-xl border border-slate-200 bg-white shadow-lg z-50 p-1.5">
-                  <div className="px-3 py-2.5 rounded-lg bg-slate-50 mb-1">
-                    <div className="text-xs text-slate-500">{nav.compute}</div>
-                    <div className="text-xl font-bold text-blue-600 leading-tight">
-                      {Math.round(user.k_compute_balance)}
+                <div className="absolute right-0 top-full pt-2 z-50">
+                  <div className="kbot-dropdown min-w-[220px] rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 p-1.5">
+                    <div className="px-3 py-2.5 rounded-xl bg-slate-50 mb-1">
+                      <div className="text-xs text-slate-500">{nav.compute}</div>
+                      <div className="text-xl font-bold text-blue-600 leading-tight">
+                        {Math.round(user.k_compute_balance)}
+                      </div>
                     </div>
-                  </div>
                   <MenuButton
                     icon="i-ph:user"
                     label={nav.settings || '個人設置'}
@@ -156,6 +169,7 @@ export function TopNav() {
                       logout();
                     }}
                   />
+                  </div>
                 </div>
               )}
             </div>
@@ -258,19 +272,21 @@ function GroupMenu({
         <div className={classNames('i-ph:caret-down text-xs transition-transform', open && 'rotate-180')} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1.5 min-w-[230px] rounded-xl border border-slate-200 bg-white shadow-lg z-50 p-1.5">
-          {group.children.map((child) => (
-            <button
-              key={child.id}
-              type="button"
-              onClick={() => {
-                window.location.href = '/product';
-              }}
-              className="flex w-full text-left px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-            >
-              {child.label}
-            </button>
-          ))}
+        <div className="absolute left-0 top-full pt-2 z-50">
+          <div className="kbot-dropdown min-w-[230px] rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10">
+            {group.children.map((child) => (
+              <button
+                key={child.id}
+                type="button"
+                onClick={() => {
+                  window.location.href = '/product';
+                }}
+                className="flex w-full text-left px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              >
+                {child.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
