@@ -98,19 +98,27 @@ interface Database {
   nextAuditLogId: number;
 }
 
+// 系統設置默認值，新數據庫與舊數據庫補字段都使用
+const DEFAULT_SYSTEM_SETTINGS = {
+  guest_access: false,
+  free_storage_bytes: 10 * 1024 * 1024,
+  free_compute: 10,
+  maintenance_mode: false,
+};
+
 // 加載數據庫
 function loadDatabase(): Database {
   if (fs.existsSync(DB_PATH)) {
     const raw = fs.readFileSync(DB_PATH, 'utf-8');
     const data = JSON.parse(raw);
-    // 確保所有字段都存在
+    // 確保所有字段都存在，系統設置與默認值合併，補齊舊數據庫缺失的鍵
     return {
       users: data.users || [],
       websites: data.websites || [],
       generation_history: data.generation_history || [],
       sessions: data.sessions || [],
       audit_logs: data.audit_logs || [],
-      system_settings: data.system_settings || {},
+      system_settings: { ...DEFAULT_SYSTEM_SETTINGS, ...(data.system_settings || {}) },
       nextUserId: data.nextUserId || 1,
       nextWebsiteId: data.nextWebsiteId || 1,
       nextHistoryId: data.nextHistoryId || 1,
@@ -123,12 +131,7 @@ function loadDatabase(): Database {
     generation_history: [],
     sessions: [],
     audit_logs: [],
-    system_settings: {
-      guest_access: false,
-      free_storage_bytes: 10 * 1024 * 1024,
-      free_compute: 10,
-      maintenance_mode: false,
-    },
+    system_settings: { ...DEFAULT_SYSTEM_SETTINGS },
     nextUserId: 1,
     nextWebsiteId: 1,
     nextHistoryId: 1,
