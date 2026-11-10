@@ -98,7 +98,9 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     return Response.redirect('/?oauth_error=not_configured');
   }
 
-  const redirectUri = `${url.origin}/auth/${provider}/callback`;
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  const origin = `${forwardedProto || 'https'}://${url.host}`;
+  const redirectUri = `${origin}/auth/${provider}/callback`;
 
   try {
     let profile: OAuthProfile;
@@ -131,12 +133,12 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     const token = createUserSession(user.id);
 
     // 設置 cookie 並重定向回首頁
-    const redirectUrl = new URL('/', url.origin);
+    const redirectUrl = new URL('/', origin);
     redirectUrl.searchParams.set('oauth_success', provider);
     const response = Response.redirect(redirectUrl.toString());
     response.headers.set(
       'Set-Cookie',
-      `kbot_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; Secure=${url.protocol === 'https:'}`,
+      `kbot_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; Secure=true`,
     );
     return response;
   } catch (err: any) {
@@ -153,6 +155,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
+  // Railway 內部是 http，但外部用戶走 https，強制用 https 構建 redirect_uri
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  const origin = `${forwardedProto || 'https'}://${url.host}`;
 
   // 如果 URL 帶 code，說明是 OAuth 回調
   if (url.searchParams.get('code')) {
@@ -167,7 +172,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }, { status: 501 });
   }
 
-  const redirectUri = `${url.origin}/auth/${provider}/callback`;
+  const redirectUri = `${origin}/auth/${provider}/callback`;
 
   const authUrls: Record<string, string> = {
     google: `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('email profile')}&access_type=online&prompt=select_account`,

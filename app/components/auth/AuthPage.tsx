@@ -157,7 +157,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
           <div className="mt-6 grid grid-cols-3 gap-3">
             <button
               type="button"
-              onClick={() => window.location.href = '/auth/google'}
+              onClick={() => window.location.href = '/auth/google/callback'}
               className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -169,7 +169,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             </button>
             <button
               type="button"
-              onClick={() => window.location.href = '/auth/apple'}
+              onClick={() => window.location.href = '/auth/apple/callback'}
               className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -178,7 +178,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             </button>
             <button
               type="button"
-              onClick={() => window.location.href = '/auth/github'}
+              onClick={() => window.location.href = '/auth/github/callback'}
               className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
