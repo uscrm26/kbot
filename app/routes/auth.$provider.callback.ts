@@ -98,8 +98,8 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     return Response.redirect('/?oauth_error=not_configured');
   }
 
-  const host = request.headers.get('host') || url.host;
-  const origin = process.env.APP_URL || `https://${host}`;
+  const host = request.headers.get('host') || '';
+  const origin = process.env.APP_URL || (host.includes('railway.app') || host.includes('up.') ? `https://${host}` : 'https://kbot-production-3c2a.up.railway.app');
   const redirectUri = `${origin}/auth/${provider}/callback`;
 
   try {
@@ -155,9 +155,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  // 從 Host 頭讀取公開域名，強制 https（Railway 內部 request.url 是 http://0.0.0.0）
-  const host = request.headers.get('host') || url.host;
-  const origin = process.env.APP_URL || `https://${host}`;
+  // 公開 URL 優先用環境變量，否則硬编码 Railway 默認域名
+  const host = request.headers.get('host') || '';
+  const origin = process.env.APP_URL || (host.includes('railway.app') || host.includes('up.') ? `https://${host}` : 'https://kbot-production-3c2a.up.railway.app');
 
   // 如果 URL 帶 code，說明是 OAuth 回調
   if (url.searchParams.get('code')) {
