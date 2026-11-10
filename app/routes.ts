@@ -20,6 +20,7 @@ export default [
   { file: 'routes/admin.tsx', path: '/admin' },
   { file: 'routes/settings.tsx', path: '/settings' },
   { file: 'routes/api.settings.ts', path: '/api/settings' },
+  { file: 'routes/api.avatar-upload.ts', path: '/api/avatar-upload' },
   { file: 'routes/pricing.tsx', path: '/pricing' },
   { file: 'routes/product.tsx', path: '/product' },
   { file: 'routes/templates.tsx', path: '/templates' },

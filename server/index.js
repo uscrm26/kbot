@@ -36,6 +36,41 @@ const MIME = {
   '.wasm': 'application/wasm',
 };
 
+function serveUploads(req, res, next) {
+  const url = new URL(req.url, 'http://localhost');
+  const pathname = decodeURIComponent(url.pathname);
+
+  if (!pathname.startsWith('/uploads/')) {
+    next();
+    return;
+  }
+
+  const dataDir = process.env.DATA_DIR || path.join(ROOT, 'data');
+  const uploadRoot = path.normalize(path.join(dataDir, 'uploads'));
+  const resolved = path.normalize(path.join(uploadRoot, pathname.slice('/uploads/'.length)));
+
+  // 防止目錄穿越
+  if (!resolved.startsWith(uploadRoot)) {
+    res.statusCode = 403;
+    res.end('Forbidden');
+    return;
+  }
+
+  fs.stat(resolved, (err, stat) => {
+    if (err || !stat.isFile()) {
+      next();
+      return;
+    }
+
+    const ext = path.extname(resolved).toLowerCase();
+    res.statusCode = 200;
+    res.setHeader('Content-Type', MIME[ext] || 'application/octet-stream');
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    fs.createReadStream(resolved).pipe(res);
+  });
+}
+
 function serveStatic(req, res, next) {
   const url = new URL(req.url, 'http://localhost');
   const pathname = decodeURIComponent(url.pathname);
@@ -76,8 +111,10 @@ async function start() {
       return;
     }
 
-    serveStatic(req, res, () => {
-      requestHandler(req, res);
+    serveUploads(req, res, () => {
+      serveStatic(req, res, () => {
+        requestHandler(req, res);
+      });
     });
   });
 

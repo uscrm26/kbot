@@ -117,20 +117,18 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     let user = userOperations.findByEmail(profile.email);
 
     if (currentUser) {
-      // 已登入用戶：綁定第三方帳號到當前帳號
-      if (!user) {
-        user = userOperations.createUser({
-          email: profile.email,
-          password_hash: '',
-          name: profile.name,
-          avatar_url: profile.avatar_url,
-        } as any);
+      // 已登入用戶：把第三方帳號綁定到「當前帳戶」，不論第三方郵箱是否對應其他帳戶
+      const field = profile.provider === 'google' ? 'google_id' : 'github_id';
+
+      // 若該第三方 ID 已被其他帳戶佔用，先解除，避免同一個第三方身份掛在多個帳戶
+      for (const other of userOperations.getAllUsers()) {
+        if (other.id !== currentUser.id && other[field] === profile.provider_id) {
+          userOperations.updateUser(other.id, { [field]: undefined } as any);
+        }
       }
-      if (profile.provider === 'google') {
-        userOperations.updateUser(user.id, { google_id: profile.provider_id } as any);
-      } else if (profile.provider === 'github') {
-        userOperations.updateUser(user.id, { github_id: profile.provider_id } as any);
-      }
+
+      userOperations.updateUser(currentUser.id, { [field]: profile.provider_id } as any);
+
       // 不更換 session，直接跳回設置頁
       return Response.redirect(`${origin}/settings?oauth_bound=${provider}`);
     }
