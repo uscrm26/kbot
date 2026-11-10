@@ -98,8 +98,7 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     return Response.redirect('/?oauth_error=not_configured');
   }
 
-  const forwardedProto = request.headers.get('x-forwarded-proto');
-  const origin = `${forwardedProto || 'https'}://${url.host}`;
+  const origin = process.env.APP_URL || `https://${url.host}`;
   const redirectUri = `${origin}/auth/${provider}/callback`;
 
   try {
@@ -155,9 +154,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  // Railway 內部是 http，但外部用戶走 https，強制用 https 構建 redirect_uri
-  const forwardedProto = request.headers.get('x-forwarded-proto');
-  const origin = `${forwardedProto || 'https'}://${url.host}`;
+  // 生產環境強制 https，避免 Railway 內部 http 導致 OAuth redirect_uri 不匹配
+  const origin = process.env.APP_URL || `https://${url.host}`;
 
   // 如果 URL 帶 code，說明是 OAuth 回調
   if (url.searchParams.get('code')) {
