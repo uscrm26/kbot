@@ -581,15 +581,15 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-2 mt-4 text-xs text-bolt-elements-textSecondary">
                     <span className="flex items-center gap-1.5">
                       <div className="i-ph:check-circle-fill text-accent-600 text-sm" />
-                      可免費開始，無需信用卡
+                      {t('trust.free')}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <div className="i-ph:check-circle-fill text-accent-600 text-sm" />
-                      生成過程即時預覽
+                      {t('trust.preview')}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <div className="i-ph:check-circle-fill text-accent-600 text-sm" />
-                      一鍵部署上線
+                      {t('trust.deploy')}
                     </span>
                   </div>
                 )}

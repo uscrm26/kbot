@@ -148,6 +148,50 @@ const CONTENT: Record<string, LocaleContent> = {
     },
     intentLabel: 'Intent',
   },
+  'en-GB': {
+    tabs: {
+      create: 'Start from Scratch',
+      shop: 'Build a Shop',
+      upgrade: 'Upgrade Website',
+      growth: 'Get Customers',
+    },
+    purposes: {
+      sell_products: { title: 'Sell Products', subtitle: 'Export sites, ecommerce, etc.' },
+      company_site: { title: 'Company Site', subtitle: 'Official sites, product showcases' },
+      service: { title: 'Services', subtitle: 'Service sites, landing pages' },
+      portfolio: { title: 'Portfolio', subtitle: 'Blogs, portfolio sites' },
+      other: { title: 'Other', subtitle: 'Other types' },
+    },
+    templates: {
+      sell_products:
+        'My product belongs to the [category, e.g. energy drinks/bestsellers/beauty] category, it is called [product name], and its unique advantage is [core selling point]. It mainly targets [target audience]. After users click "Buy", I want them redirected mainly to [platform, e.g. Amazon/Taobao/JD].',
+      company_site:
+        'My company is called [company name], we mainly provide [industry service], and we want to present a [professional/innovative] corporate image. In one sentence, introduce our company as [ ].',
+      service:
+        'I am [name], specialising in [legal/financial services], mainly helping [individuals/companies] with [legal services/finance and accounting/tax and compliance/management and strategy consulting/education and training], serving [mainland China/Japan/United Kingdom]. This website will showcase my [qualifications, partner organisations/clients, past cases and professional articles].',
+      portfolio:
+        'My photography style is [e.g. portrait/landscape/product], my main works are [photos/videos], and my name is [brand/personal name].',
+      other:
+        'I want to build a [website type] website, the website/project name is [project name], it mainly serves [target users], its core value is [core value], I want the website to focus on [core content/modules], and the overall style should lean towards [brand tone/visual feel].',
+    },
+    shopPrompt: 'Help me build a coffee H5 ordering website that also includes a merchandise shop for the coffee brand.',
+    shopInstallPrompt: 'Please first read the shop-install skill and follow that skill to complete the shop integration.',
+    modes: {
+      speed: {
+        title: 'Speed Mode',
+        shortDesc: 'Skip design draft, build directly',
+        tooltip:
+          'Best for mini games, small tools, interactive prototypes and quick idea validation. Skip static design drafts and generate a working project directly.',
+      },
+      design: {
+        title: 'Design Mode',
+        shortDesc: 'Design first, then build',
+        tooltip:
+          'Best for corporate sites, brand showcases and product pages where visual presentation matters. Generate a static design draft first, confirm it, then build the website.',
+      },
+    },
+    intentLabel: 'Intent',
+  },
   ja: {
     tabs: {
       create: '新規作成',

@@ -198,7 +198,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   return (
     <div
       className={classNames(
-        'relative bg-white p-3 rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgba(15,23,42,0.08),0_2px_8px_rgba(15,23,42,0.04)] focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all duration-200 relative w-full max-w-chat mx-auto z-prompt',
+        'relative bg-white p-3 rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgba(15,23,42,0.08),0_2px_8px_rgba(15,23,42,0.04)] focus-within:border-accent-400 focus-within:ring-4 focus-within:ring-accent-500/10 transition-all duration-200 relative w-full max-w-chat mx-auto z-prompt',
 
         /*
          * {
@@ -413,11 +413,11 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             <button
               type="button"
               onClick={() => props.enhancePrompt?.()}
-              title="意圖識別"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border border-bolt-elements-borderColor text-bolt-elements-textSecondary hover:text-accent-600 hover:border-accent-600 transition-colors"
+              title={t('chat.intent')}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-slate-900 text-white hover:bg-slate-800 transition-colors"
             >
-              <div className="i-ph:sparkles text-base" />
-              <span>意圖識別</span>
+              <div className="i-ph:sparkle text-base" />
+              <span>{t('chat.intent')}</span>
             </button>
             {/* 簡易模式只顯示前 3 個核心選項，進階模式顯示全部 */}
             {(isAdvancedMode ? purposeOptions : purposeOptions.slice(0, 3)).map((p) => (
@@ -427,10 +427,10 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 onClick={() => handlePurposeClick(p.id)}
                 title={p.subtitle}
                 className={classNames(
-                  'flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border transition-colors',
+                  'flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full transition-colors',
                   activePurpose === p.id
-                    ? 'border-accent-600 text-accent-600 bg-accent-500/10'
-                    : 'border-bolt-elements-borderColor text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive',
+                    ? 'bg-accent-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
                 )}
               >
                 <div className={`${p.icon} text-base`} />
@@ -441,10 +441,10 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             <button
               type="button"
               onClick={() => setIsAdvancedMode(!isAdvancedMode)}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-full text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
             >
               <div className={`${isAdvancedMode ? 'i-ph:caret-up' : 'i-ph:caret-down'} text-sm`} />
-              <span>{isAdvancedMode ? '簡易模式' : '進階模式'}</span>
+              <span>{isAdvancedMode ? t('chat.simple.mode') : t('chat.advanced.mode')}</span>
             </button>
           </div>
         )}

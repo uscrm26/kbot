@@ -55,7 +55,7 @@ export function TopNav() {
                 };
                 window.location.href = hrefMap[link.id] || '/product';
               }}
-              className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap"
+              className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-900/5 transition-colors whitespace-nowrap"
             >
               {link.label}
             </button>
@@ -69,7 +69,7 @@ export function TopNav() {
             <button
               type="button"
               onClick={() => setLangOpen((v) => !v)}
-              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-900/5 transition-colors"
             >
               <div className="i-ph:globe text-base" />
               <span>{languages.find((l) => l.code === currentLang)?.flag || '🇭🇰'}</span>
@@ -89,7 +89,7 @@ export function TopNav() {
                       className={classNames(
                         'flex items-center gap-2 w-full text-left px-3 py-2 text-sm rounded-lg',
                         lang.code === currentLang
-                          ? 'text-blue-600 bg-blue-50 font-medium'
+                          ? 'text-accent-600 bg-accent-50 font-medium'
                           : 'text-slate-700 hover:bg-slate-100',
                       )}
                     >
@@ -109,9 +109,9 @@ export function TopNav() {
               <button
                 type="button"
                 onClick={() => setUserMenuOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-900/5 transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
+                <div className="w-7 h-7 rounded-full bg-accent-600 text-white flex items-center justify-center text-xs font-semibold">
                   {user.name.slice(0, 1)}
                 </div>
                 <span className="hidden sm:inline max-w-[120px] truncate">{user.name}</span>
@@ -122,7 +122,7 @@ export function TopNav() {
                   <div className="kbot-dropdown min-w-[220px] rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 p-1.5">
                     <div className="px-3 py-2.5 rounded-xl bg-slate-50 mb-1">
                       <div className="text-xs text-slate-500">{nav.compute}</div>
-                      <div className="text-xl font-bold text-blue-600 leading-tight">
+                      <div className="text-xl font-bold text-accent-600 leading-tight">
                         {Math.round(user.k_compute_balance)}
                       </div>
                     </div>
@@ -177,7 +177,7 @@ export function TopNav() {
             <button
               type="button"
               onClick={() => setAuthOpen(true)}
-              className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="px-3 py-2 text-sm rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-900/5 transition-colors"
             >
               {nav.login}
             </button>
@@ -188,7 +188,7 @@ export function TopNav() {
             onClick={() => {
               window.location.href = '/';
             }}
-            className="ml-1 px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium whitespace-nowrap"
+            className="ml-1 px-4 py-2 text-sm rounded-lg bg-accent-600 text-white hover:bg-accent-700 transition-colors font-medium whitespace-nowrap"
           >
             {nav.start}
           </button>
@@ -265,7 +265,7 @@ function GroupMenu({
         onClick={() => onOpenChange(!open)}
         className={classNames(
           'flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap',
-          open ? 'text-slate-900 bg-slate-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+          open ? 'text-slate-900 bg-slate-900/5' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-900/5',
         )}
       >
         {group.label}
