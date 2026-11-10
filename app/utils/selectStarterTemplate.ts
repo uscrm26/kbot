@@ -2,6 +2,7 @@ import ignore from 'ignore';
 import { STARTER_TEMPLATES } from './constants';
 import { createCommandActionsString, detectProjectCommands } from './projectCommands';
 import type { ProviderInfo } from '~/types/model';
+import { t } from '~/lib/i18n';
 
 export const selectStarterTemplate = async (options: { message: string; model?: string; provider?: ProviderInfo }) => {
   const { message } = options;
@@ -124,8 +125,10 @@ export async function getTemplates(templateName: string, title?: string, signal?
     filesToImport.ignoreFile = ignoredFiles;
   }
 
+  const initializingText = t('starter.initializing').replace('{template}', template.name);
+
   const assistantMessage = `
-Bolt is initializing your project with the required files using the ${template.name} template.
+${initializingText}
 <boltArtifact id="imported-files" title="${title || 'Create initial files'}" type="bundled">
 ${filesToImport.files
   .map(
