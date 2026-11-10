@@ -112,13 +112,15 @@ function loadDatabase(): Database {
     const raw = fs.readFileSync(DB_PATH, 'utf-8');
     const data = JSON.parse(raw);
     // 確保所有字段都存在，系統設置與默認值合併，補齊舊數據庫缺失的鍵
+    const systemSettings = { ...DEFAULT_SYSTEM_SETTINGS, ...(data.system_settings || {}) };
+    delete (systemSettings as any).settings;
     return {
       users: data.users || [],
       websites: data.websites || [],
       generation_history: data.generation_history || [],
       sessions: data.sessions || [],
       audit_logs: data.audit_logs || [],
-      system_settings: { ...DEFAULT_SYSTEM_SETTINGS, ...(data.system_settings || {}) },
+      system_settings: systemSettings,
       nextUserId: data.nextUserId || 1,
       nextWebsiteId: data.nextWebsiteId || 1,
       nextHistoryId: data.nextHistoryId || 1,
@@ -361,6 +363,7 @@ export const systemSettingsOperations = {
 
   update(updates: Record<string, any>): Record<string, any> {
     db.system_settings = { ...db.system_settings, ...updates };
+    delete (db.system_settings as any).settings;
     saveDatabase(db);
     return db.system_settings;
   },
