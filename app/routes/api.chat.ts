@@ -501,6 +501,10 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
               });
 
               // 成功完成後扣減 K 算力並記錄生成歷史
+              logger.info(
+                `KCOST_FINAL computeType=${computeType} promptTokens=${cumulativeUsage.promptTokens} completionTokens=${cumulativeUsage.completionTokens} totalTokens=${cumulativeUsage.totalTokens}`,
+              );
+
               if (currentUser && currentUser.role !== 'admin') {
                 deductKCompute(currentUser.id, computeType);
 
