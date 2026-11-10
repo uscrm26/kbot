@@ -52,6 +52,12 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
+          <img
+            src="/logo/kbot-mascot.png"
+            alt="K-bot"
+            className="w-20 h-20 mx-auto mb-4 rounded-2xl"
+            style={{ animation: 'kbot-float 3s ease-in-out infinite' }}
+          />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {mode === 'login' ? t('auth.login') : t('auth.register')}
           </h1>
