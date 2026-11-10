@@ -18,6 +18,8 @@ export default [
   { file: 'routes/starter.tsx', path: '/starter' },
   { file: 'routes/auth.tsx', path: '/auth' },
   { file: 'routes/admin.tsx', path: '/admin' },
+  { file: 'routes/settings.tsx', path: '/settings' },
+  { file: 'routes/api.settings.ts', path: '/api/settings' },
   { file: 'routes/pricing.tsx', path: '/pricing' },
   { file: 'routes/product.tsx', path: '/product' },
   { file: 'routes/templates.tsx', path: '/templates' },
