@@ -98,7 +98,8 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     return Response.redirect('/?oauth_error=not_configured');
   }
 
-  const origin = process.env.APP_URL || `https://${url.host}`;
+  const host = request.headers.get('host') || url.host;
+  const origin = process.env.APP_URL || `https://${host}`;
   const redirectUri = `${origin}/auth/${provider}/callback`;
 
   try {
@@ -154,8 +155,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  // 生產環境強制 https，避免 Railway 內部 http 導致 OAuth redirect_uri 不匹配
-  const origin = process.env.APP_URL || `https://${url.host}`;
+  // 從 Host 頭讀取公開域名，強制 https（Railway 內部 request.url 是 http://0.0.0.0）
+  const host = request.headers.get('host') || url.host;
+  const origin = process.env.APP_URL || `https://${host}`;
 
   // 如果 URL 帶 code，說明是 OAuth 回調
   if (url.searchParams.get('code')) {
