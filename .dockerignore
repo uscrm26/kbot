@@ -19,11 +19,9 @@ README.md
 **/*.log
 **/node_modules
 **/dist
-**/build
 **/.cache
 logs
 dist-ssr
 .DS_Store
-build/
 node_modules/
 .data/
