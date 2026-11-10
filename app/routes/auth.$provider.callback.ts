@@ -98,9 +98,9 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     return Response.redirect('/?oauth_error=not_configured');
   }
 
-  const host = request.headers.get('host') || '';
-  const origin = process.env.APP_URL || (host.includes('railway.app') || host.includes('up.') ? `https://${host}` : 'https://kbot-production-3c2a.up.railway.app');
-  const redirectUri = `${origin}/auth/${provider}/callback`;
+  const redirectUri = process.env.APP_URL
+    ? `${process.env.APP_URL}/auth/${provider}/callback`
+    : `https://kbot-production-3c2a.up.railway.app/auth/${provider}/callback`;
 
   try {
     let profile: OAuthProfile;
@@ -155,9 +155,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  // 公開 URL 優先用環境變量，否則硬编码 Railway 默認域名
-  const host = request.headers.get('host') || '';
-  const origin = process.env.APP_URL || (host.includes('railway.app') || host.includes('up.') ? `https://${host}` : 'https://kbot-production-3c2a.up.railway.app');
 
   // 如果 URL 帶 code，說明是 OAuth 回調
   if (url.searchParams.get('code')) {
@@ -172,7 +169,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }, { status: 501 });
   }
 
-  const redirectUri = `${origin}/auth/${provider}/callback`;
+  const redirectUri = process.env.APP_URL
+    ? `${process.env.APP_URL}/auth/${provider}/callback`
+    : `https://kbot-production-3c2a.up.railway.app/auth/${provider}/callback`;
 
   const authUrls: Record<string, string> = {
     google: `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent('email profile')}&access_type=online&prompt=select_account`,
