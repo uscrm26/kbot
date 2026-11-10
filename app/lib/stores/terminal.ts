@@ -53,6 +53,7 @@ export class TerminalStore {
 
       this.#boltOutputReady = true;
     } catch (error: any) {
+      console.error('attachBoltTerminal failed:', error);
       terminal.write(coloredText.red('Failed to spawn bolt shell\n\n') + error.message);
       return;
     }
