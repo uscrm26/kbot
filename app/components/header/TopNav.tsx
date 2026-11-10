@@ -114,6 +114,14 @@ export function TopNav() {
                     </div>
                   </div>
                   <MenuButton
+                    icon="i-ph:user"
+                    label={nav.settings || '個人設置'}
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      window.location.href = '/settings';
+                    }}
+                  />
+                  <MenuButton
                     icon="i-ph:globe"
                     label={nav.mySites}
                     onClick={() => {
@@ -121,6 +129,16 @@ export function TopNav() {
                       window.location.href = '/dashboard';
                     }}
                   />
+                  {user.role === 'admin' && (
+                    <MenuButton
+                      icon="i-ph:shield"
+                      label="後台設置"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        window.location.href = '/admin';
+                      }}
+                    />
+                  )}
                   <MenuButton
                     icon="i-ph:currency-cny"
                     label={nav.upgrade}

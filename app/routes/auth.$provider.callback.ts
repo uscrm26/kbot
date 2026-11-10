@@ -1,4 +1,4 @@
-import { createUserSession } from '~/lib/server/auth';
+import { createUserSession, getCurrentUser } from '~/lib/server/auth';
 import { userOperations } from '~/lib/server/database';
 import type { LoaderFunctionArgs } from 'react-router';
 
@@ -113,7 +113,28 @@ async function handleCallback(request: Request, provider: string): Promise<Respo
     }
 
     // 查找或創建用戶
+    const currentUser = getCurrentUser(request);
     let user = userOperations.findByEmail(profile.email);
+
+    if (currentUser) {
+      // 已登入用戶：綁定第三方帳號到當前帳號
+      if (!user) {
+        user = userOperations.createUser({
+          email: profile.email,
+          password_hash: '',
+          name: profile.name,
+          avatar_url: profile.avatar_url,
+        } as any);
+      }
+      if (profile.provider === 'google') {
+        userOperations.updateUser(user.id, { google_id: profile.provider_id } as any);
+      } else if (profile.provider === 'github') {
+        userOperations.updateUser(user.id, { github_id: profile.provider_id } as any);
+      }
+      // 不更換 session，直接跳回設置頁
+      return Response.redirect(`${origin}/settings?oauth_bound=${provider}`);
+    }
+
     if (!user) {
       user = userOperations.createUser({
         email: profile.email,
