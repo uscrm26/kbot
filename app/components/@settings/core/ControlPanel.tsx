@@ -8,7 +8,7 @@ import { TabTile } from '~/components/@settings/shared/components/TabTile';
 
 // Import all tab components
 import ConnectorsTab from '~/components/@settings/tabs/connectors/ConnectorsTab';
-import { DataTab } from '~/components/@settings/tabs/data/DataTab';
+import { DataTab } from '../tabs/data/DataTab';
 import { EventLogsTab } from '~/components/@settings/tabs/event-logs/EventLogsTab';
 import FeaturesTab from '~/components/@settings/tabs/features/FeaturesTab';
 import GitHubTab from '~/components/@settings/tabs/github/GitHubTab';
